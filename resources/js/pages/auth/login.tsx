@@ -1,123 +1,123 @@
-import InputError from '@/components/input-error';
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
-import { useTranslation } from '@/i18n';
-import AuthLayout from '@/layouts/auth-layout';
-import { register } from '@/routes';
-import { store } from '@/routes/login';
-import { request } from '@/routes/password';
-import { Form, Head } from '@inertiajs/react';
+import React, { useState, useEffect } from 'react';
+import { Form, Input, Button, Checkbox, Typography, message } from 'antd';
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../../stores/authStore';
+import { useTranslation } from '../../i18n';
 
-interface LoginProps {
-    status?: string;
-    canResetPassword: boolean;
-    canRegister: boolean;
+const { Title, Text } = Typography;
+
+interface LoginFormValues {
+    email: string;
+    password: string;
+    remember: boolean;
 }
 
-export default function Login({
-    status,
-    canResetPassword,
-    canRegister,
-}: LoginProps) {
+const Login: React.FC = () => {
+    const [loading, setLoading] = useState(false);
+    const { login, isAuthenticated } = useAuthStore();
+    const navigate = useNavigate();
     const { t } = useTranslation();
 
+    useEffect(() => {
+        document.title = `${t('authPages.loginTitle')} - ${t('app.title')}`;
+    }, [t]);
+
+    // Redirect if already authenticated
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate('/dashboard', { replace: true });
+        }
+    }, [isAuthenticated, navigate]);
+
+    const onFinish = async (values: LoginFormValues) => {
+        setLoading(true);
+        try {
+            await login({
+                email: values.email,
+                password: values.password,
+                remember: values.remember,
+            });
+            message.success(t('messages.welcomeBack'));
+            navigate('/dashboard');
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : t('errors.invalidCredentials');
+            message.error(errorMessage);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
-        <AuthLayout
-            title={t('authPages.loginTitle')}
-            description={t('authPages.loginSubtitle')}
-        >
-            <Head title="Log in" />
+        <div style={{ maxWidth: 400, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                <Title level={2}>{t('authPages.loginTitle')}</Title>
+                <Text type="secondary">{t('authPages.loginSubtitle')}</Text>
+            </div>
 
             <Form
-                {...store.form()}
-                resetOnSuccess={['password']}
-                className="flex flex-col gap-6"
+                name="login"
+                initialValues={{ remember: true }}
+                onFinish={onFinish}
+                layout="vertical"
+                size="large"
             >
-                {({ processing, errors }) => (
-                    <>
-                        <div className="grid gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">{t('authPages.emailLabel')}</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    name="email"
-                                    required
-                                    autoFocus
-                                    tabIndex={1}
-                                    autoComplete="email"
-                                    placeholder="email@example.com"
-                                />
-                                <InputError message={errors.email} />
-                            </div>
+                <Form.Item
+                    name="email"
+                    rules={[
+                        { required: true, message: t('validation.required') },
+                        { type: 'email', message: t('validation.email') },
+                    ]}
+                >
+                    <Input
+                        prefix={<UserOutlined />}
+                        placeholder={t('authPages.emailLabel')}
+                        autoComplete="email"
+                    />
+                </Form.Item>
 
-                            <div className="grid gap-2">
-                                <div className="flex items-center">
-                                    <Label htmlFor="password">{t('authPages.passwordLabel')}</Label>
-                                    {canResetPassword && (
-                                        <TextLink
-                                            href={request()}
-                                            className="ml-auto text-sm"
-                                            tabIndex={5}
-                                        >
-                                            {t('authPages.forgotPasswordLink')}
-                                        </TextLink>
-                                    )}
-                                </div>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    name="password"
-                                    required
-                                    tabIndex={2}
-                                    autoComplete="current-password"
-                                    placeholder="Password"
-                                />
-                                <InputError message={errors.password} />
-                            </div>
+                <Form.Item
+                    name="password"
+                    rules={[{ required: true, message: t('validation.required') }]}
+                >
+                    <Input.Password
+                        prefix={<LockOutlined />}
+                        placeholder={t('authPages.passwordLabel')}
+                        autoComplete="current-password"
+                    />
+                </Form.Item>
 
-                            <div className="flex items-center space-x-3">
-                                <Checkbox
-                                    id="remember"
-                                    name="remember"
-                                    tabIndex={3}
-                                />
-                                <Label htmlFor="remember">{t('authPages.rememberMe')}</Label>
-                            </div>
+                <Form.Item>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Form.Item name="remember" valuePropName="checked" noStyle>
+                            <Checkbox>{t('authPages.rememberMe')}</Checkbox>
+                        </Form.Item>
+                        <Link to="/auth/forgot-password">
+                            {t('authPages.forgotPasswordLink')}
+                        </Link>
+                    </div>
+                </Form.Item>
 
-                            <Button
-                                type="submit"
-                                className="mt-4 w-full"
-                                tabIndex={4}
-                                disabled={processing}
-                                data-test="login-button"
-                            >
-                                {processing && <Spinner />}
-                                {t('authPages.loginButton')}
-                            </Button>
-                        </div>
+                <Form.Item>
+                    <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={loading}
+                        block
+                    >
+                        {t('authPages.loginButton')}
+                    </Button>
+                </Form.Item>
 
-                        {canRegister && (
-                            <div className="text-center text-sm text-muted-foreground">
-                                {t('authPages.noAccountLink')}{' '}
-                                <TextLink href={register()} tabIndex={5}>
-                                    {t('authPages.signUpLink')}
-                                </TextLink>
-                            </div>
-                        )}
-                    </>
-                )}
-            </Form>
-
-            {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    {status}
+                <div style={{ textAlign: 'center' }}>
+                    <Text>
+                        {t('authPages.noAccountLink')}{' '}
+                        <Link to="/auth/register">{t('authPages.signUpLink')}</Link>
+                    </Text>
                 </div>
-            )}
-        </AuthLayout>
+            </Form>
+        </div>
     );
-}
+};
+
+export default Login;

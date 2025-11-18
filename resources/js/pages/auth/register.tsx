@@ -1,118 +1,149 @@
-import { useTranslation } from '@/i18n';
-import { login } from '@/routes';
-import { store } from '@/routes/register';
-import { Form, Head } from '@inertiajs/react';
+import React, { useState, useEffect } from 'react';
+import { Form, Input, Button, Typography, message } from 'antd';
+import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../../stores/authStore';
+import { useTranslation } from '../../i18n';
 
-import InputError from '@/components/input-error';
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
-import AuthLayout from '@/layouts/auth-layout';
+const { Title, Text } = Typography;
 
-export default function Register() {
+interface RegisterFormValues {
+    name: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
+}
+
+const Register: React.FC = () => {
+    const [loading, setLoading] = useState(false);
+    const { register, isAuthenticated } = useAuthStore();
+    const navigate = useNavigate();
     const { t } = useTranslation();
 
+    useEffect(() => {
+        document.title = `${t('authPages.registerTitle')} - ${t('app.title')}`;
+    }, [t]);
+
+    // Redirect if already authenticated
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate('/dashboard', { replace: true });
+        }
+    }, [isAuthenticated, navigate]);
+
+    const onFinish = async (values: RegisterFormValues) => {
+        setLoading(true);
+        try {
+            await register({
+                name: values.name,
+                email: values.email,
+                password: values.password,
+                password_confirmation: values.password_confirmation,
+            });
+            message.success(t('messages.accountCreated'));
+            navigate('/dashboard');
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : t('errors.createFailed');
+            message.error(errorMessage);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
-        <AuthLayout
-            title={t('authPages.registerTitle')}
-            description={t('authPages.registerSubtitle')}
-        >
-            <Head title="Register" />
+        <div style={{ maxWidth: 400, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                <Title level={2}>{t('authPages.registerTitle')}</Title>
+                <Text type="secondary">{t('authPages.registerSubtitle')}</Text>
+            </div>
+
             <Form
-                {...store.form()}
-                resetOnSuccess={['password', 'password_confirmation']}
-                disableWhileProcessing
-                className="flex flex-col gap-6"
+                name="register"
+                onFinish={onFinish}
+                layout="vertical"
+                size="large"
             >
-                {({ processing, errors }) => (
-                    <>
-                        <div className="grid gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="name">{t('authPages.nameLabel')}</Label>
-                                <Input
-                                    id="name"
-                                    type="text"
-                                    required
-                                    autoFocus
-                                    tabIndex={1}
-                                    autoComplete="name"
-                                    name="name"
-                                    placeholder="Full name"
-                                />
-                                <InputError
-                                    message={errors.name}
-                                    className="mt-2"
-                                />
-                            </div>
+                <Form.Item
+                    name="name"
+                    rules={[{ required: true, message: t('validation.required') }]}
+                >
+                    <Input
+                        prefix={<UserOutlined />}
+                        placeholder={t('authPages.nameLabel')}
+                        autoComplete="name"
+                    />
+                </Form.Item>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">{t('authPages.emailLabel')}</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    required
-                                    tabIndex={2}
-                                    autoComplete="email"
-                                    name="email"
-                                    placeholder="email@example.com"
-                                />
-                                <InputError message={errors.email} />
-                            </div>
+                <Form.Item
+                    name="email"
+                    rules={[
+                        { required: true, message: t('validation.required') },
+                        { type: 'email', message: t('validation.email') },
+                    ]}
+                >
+                    <Input
+                        prefix={<MailOutlined />}
+                        placeholder={t('authPages.emailLabel')}
+                        autoComplete="email"
+                    />
+                </Form.Item>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="password">{t('authPages.passwordLabel')}</Label>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    required
-                                    tabIndex={3}
-                                    autoComplete="new-password"
-                                    name="password"
-                                    placeholder="Password"
-                                />
-                                <InputError message={errors.password} />
-                            </div>
+                <Form.Item
+                    name="password"
+                    rules={[
+                        { required: true, message: t('validation.required') },
+                        { min: 8, message: t('validation.min', { min: '8' }) },
+                    ]}
+                >
+                    <Input.Password
+                        prefix={<LockOutlined />}
+                        placeholder={t('authPages.passwordLabel')}
+                        autoComplete="new-password"
+                    />
+                </Form.Item>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="password_confirmation">
-                                    {t('authPages.confirmPasswordLabel')}
-                                </Label>
-                                <Input
-                                    id="password_confirmation"
-                                    type="password"
-                                    required
-                                    tabIndex={4}
-                                    autoComplete="new-password"
-                                    name="password_confirmation"
-                                    placeholder="Confirm password"
-                                />
-                                <InputError
-                                    message={errors.password_confirmation}
-                                />
-                            </div>
+                <Form.Item
+                    name="password_confirmation"
+                    dependencies={['password']}
+                    rules={[
+                        { required: true, message: t('validation.required') },
+                        ({ getFieldValue }) => ({
+                            validator(_, value) {
+                                if (!value || getFieldValue('password') === value) {
+                                    return Promise.resolve();
+                                }
+                                return Promise.reject(new Error(t('errors.passwordMismatch')));
+                            },
+                        }),
+                    ]}
+                >
+                    <Input.Password
+                        prefix={<LockOutlined />}
+                        placeholder={t('authPages.confirmPasswordLabel')}
+                        autoComplete="new-password"
+                    />
+                </Form.Item>
 
-                            <Button
-                                type="submit"
-                                className="mt-2 w-full"
-                                tabIndex={5}
-                                data-test="register-user-button"
-                            >
-                                {processing && <Spinner />}
-                                {t('authPages.registerButton')}
-                            </Button>
-                        </div>
+                <Form.Item>
+                    <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={loading}
+                        block
+                    >
+                        {t('authPages.registerButton')}
+                    </Button>
+                </Form.Item>
 
-                        <div className="text-center text-sm text-muted-foreground">
-                            {t('authPages.hasAccountLink')}{' '}
-                            <TextLink href={login()} tabIndex={6}>
-                                {t('authPages.loginLink')}
-                            </TextLink>
-                        </div>
-                    </>
-                )}
+                <div style={{ textAlign: 'center' }}>
+                    <Text>
+                        {t('authPages.hasAccountLink')}{' '}
+                        <Link to="/auth/login">{t('authPages.loginLink')}</Link>
+                    </Text>
+                </div>
             </Form>
-        </AuthLayout>
+        </div>
     );
-}
+};
+
+export default Register;
