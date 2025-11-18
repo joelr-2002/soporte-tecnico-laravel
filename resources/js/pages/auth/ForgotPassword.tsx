@@ -3,7 +3,7 @@ import { Form, Input, Button, Typography, message, Result } from 'antd';
 import { MailOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
-import { useTranslation } from '../../hooks/useSettings';
+import { useTranslation } from '../../i18n';
 import { getErrorMessage } from '../../services/api';
 
 const { Title, Text, Paragraph } = Typography;

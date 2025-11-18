@@ -3,7 +3,7 @@ import { Form, Input, Button, Typography, message, Divider } from 'antd';
 import { UserOutlined, MailOutlined, LockOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
-import { useTranslation } from '../../hooks/useSettings';
+import { useTranslation } from '../../i18n';
 import { getErrorMessage } from '../../services/api';
 import { RegisterData } from '../../types';
 
