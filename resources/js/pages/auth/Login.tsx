@@ -3,6 +3,7 @@ import { Form, Input, Button, Checkbox, Typography, Divider, App } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
+import { useTranslation } from '../../hooks/useSettings';
 import { getErrorMessage } from '../../services/api';
 import { LoginCredentials } from '../../types';
 
@@ -13,11 +14,12 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const { login, isLoading } = useAuthStore();
   const { message } = App.useApp();
+  const { t } = useTranslation();
 
   const onFinish = async (values: LoginCredentials) => {
     try {
       await login(values);
-      message.success('Welcome back!');
+      message.success(t('auth.welcomeBackMessage'));
       navigate('/dashboard');
     } catch (error) {
       message.error(getErrorMessage(error));
@@ -28,10 +30,10 @@ const Login: React.FC = () => {
     <div style={{ width: '100%', maxWidth: 400 }}>
       <div style={{ textAlign: 'center', marginBottom: 32 }}>
         <Title level={2} style={{ marginBottom: 8 }}>
-          Welcome Back
+          {t('auth.welcomeBack')}
         </Title>
         <Text type="secondary">
-          Sign in to your account to continue
+          {t('auth.signInToAccount')}
         </Text>
       </div>
 
@@ -46,35 +48,35 @@ const Login: React.FC = () => {
         <Form.Item
           name="email"
           rules={[
-            { required: true, message: 'Please enter your email' },
-            { type: 'email', message: 'Please enter a valid email' }
+            { required: true, message: t('validation.emailRequired') },
+            { type: 'email', message: t('validation.emailInvalid') }
           ]}
         >
           <Input
             prefix={<UserOutlined />}
-            placeholder="Email address"
+            placeholder={t('auth.emailAddress')}
           />
         </Form.Item>
 
         <Form.Item
           name="password"
           rules={[
-            { required: true, message: 'Please enter your password' }
+            { required: true, message: t('validation.passwordRequired') }
           ]}
         >
           <Input.Password
             prefix={<LockOutlined />}
-            placeholder="Password"
+            placeholder={t('auth.password')}
           />
         </Form.Item>
 
         <Form.Item>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Form.Item name="remember" valuePropName="checked" noStyle>
-              <Checkbox>Remember me</Checkbox>
+              <Checkbox>{t('auth.rememberMe')}</Checkbox>
             </Form.Item>
             <Link to="/auth/forgot-password">
-              Forgot password?
+              {t('auth.forgotPassword')}
             </Link>
           </div>
         </Form.Item>
@@ -86,18 +88,18 @@ const Login: React.FC = () => {
             block
             loading={isLoading}
           >
-            Sign In
+            {t('auth.signIn')}
           </Button>
         </Form.Item>
 
         <Divider plain>
-          <Text type="secondary">Don't have an account?</Text>
+          <Text type="secondary">{t('auth.dontHaveAccount')}</Text>
         </Divider>
 
         <div style={{ textAlign: 'center' }}>
           <Link to="/auth/register">
             <Button type="link" size="large">
-              Create an account
+              {t('auth.createAccount')}
             </Button>
           </Link>
         </div>

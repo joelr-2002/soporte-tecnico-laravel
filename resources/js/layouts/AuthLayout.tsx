@@ -2,12 +2,14 @@ import React from 'react';
 import { Layout, Card, Typography } from 'antd';
 import { Outlet, Navigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
+import { useTranslation } from '../hooks/useSettings';
 
 const { Content } = Layout;
 const { Title } = Typography;
 
 const AuthLayout: React.FC = () => {
   const { isAuthenticated } = useAuthStore();
+  const { t } = useTranslation();
 
   // Redirect to dashboard if already authenticated
   if (isAuthenticated) {
@@ -34,7 +36,7 @@ const AuthLayout: React.FC = () => {
         >
           <div style={{ textAlign: 'center', marginBottom: 24 }}>
             <Title level={3} style={{ margin: 0, color: '#1890ff' }}>
-              Support Ticket System
+              {t('app.title')}
             </Title>
           </div>
           <Outlet />

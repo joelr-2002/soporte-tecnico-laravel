@@ -3,6 +3,7 @@ import { Form, Input, Button, Typography, message, Divider } from 'antd';
 import { UserOutlined, MailOutlined, LockOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
+import { useTranslation } from '../../hooks/useSettings';
 import { getErrorMessage } from '../../services/api';
 import { RegisterData } from '../../types';
 
@@ -12,11 +13,12 @@ const Register: React.FC = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { register, isLoading } = useAuthStore();
+  const { t } = useTranslation();
 
   const onFinish = async (values: RegisterData) => {
     try {
       await register(values);
-      message.success('Account created successfully!');
+      message.success(t('auth.accountCreatedSuccess'));
       navigate('/dashboard');
     } catch (error) {
       message.error(getErrorMessage(error));
@@ -27,10 +29,10 @@ const Register: React.FC = () => {
     <div style={{ width: '100%', maxWidth: 400 }}>
       <div style={{ textAlign: 'center', marginBottom: 32 }}>
         <Title level={2} style={{ marginBottom: 8 }}>
-          Create Account
+          {t('auth.createAccount')}
         </Title>
         <Text type="secondary">
-          Sign up to get started with our support system
+          {t('auth.signUpToGetStarted')}
         </Text>
       </div>
 
@@ -45,39 +47,39 @@ const Register: React.FC = () => {
         <Form.Item
           name="name"
           rules={[
-            { required: true, message: 'Please enter your name' },
-            { min: 2, message: 'Name must be at least 2 characters' }
+            { required: true, message: t('validation.nameRequired') },
+            { min: 2, message: t('validation.nameMinLength') }
           ]}
         >
           <Input
             prefix={<UserOutlined />}
-            placeholder="Full name"
+            placeholder={t('auth.fullName')}
           />
         </Form.Item>
 
         <Form.Item
           name="email"
           rules={[
-            { required: true, message: 'Please enter your email' },
-            { type: 'email', message: 'Please enter a valid email' }
+            { required: true, message: t('validation.emailRequired') },
+            { type: 'email', message: t('validation.emailInvalid') }
           ]}
         >
           <Input
             prefix={<MailOutlined />}
-            placeholder="Email address"
+            placeholder={t('auth.emailAddress')}
           />
         </Form.Item>
 
         <Form.Item
           name="password"
           rules={[
-            { required: true, message: 'Please enter a password' },
-            { min: 8, message: 'Password must be at least 8 characters' }
+            { required: true, message: t('validation.passwordRequired') },
+            { min: 8, message: t('validation.passwordMinLength') }
           ]}
         >
           <Input.Password
             prefix={<LockOutlined />}
-            placeholder="Password"
+            placeholder={t('auth.password')}
           />
         </Form.Item>
 
@@ -85,20 +87,20 @@ const Register: React.FC = () => {
           name="password_confirmation"
           dependencies={['password']}
           rules={[
-            { required: true, message: 'Please confirm your password' },
+            { required: true, message: t('validation.confirmPasswordRequired') },
             ({ getFieldValue }) => ({
               validator(_, value) {
                 if (!value || getFieldValue('password') === value) {
                   return Promise.resolve();
                 }
-                return Promise.reject(new Error('Passwords do not match'));
+                return Promise.reject(new Error(t('validation.passwordsDoNotMatch')));
               },
             }),
           ]}
         >
           <Input.Password
             prefix={<LockOutlined />}
-            placeholder="Confirm password"
+            placeholder={t('auth.confirmPassword')}
           />
         </Form.Item>
 
@@ -109,18 +111,18 @@ const Register: React.FC = () => {
             block
             loading={isLoading}
           >
-            Create Account
+            {t('auth.createAccount')}
           </Button>
         </Form.Item>
 
         <Divider plain>
-          <Text type="secondary">Already have an account?</Text>
+          <Text type="secondary">{t('auth.alreadyHaveAccount')}</Text>
         </Divider>
 
         <div style={{ textAlign: 'center' }}>
           <Link to="/auth/login">
             <Button type="link" size="large">
-              Sign in instead
+              {t('auth.signInInstead')}
             </Button>
           </Link>
         </div>

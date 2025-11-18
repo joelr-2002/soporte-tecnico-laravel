@@ -3,6 +3,7 @@ import { Form, Input, Button, Typography, message, Result } from 'antd';
 import { MailOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
+import { useTranslation } from '../../hooks/useSettings';
 import { getErrorMessage } from '../../services/api';
 
 const { Title, Text, Paragraph } = Typography;
@@ -12,13 +13,14 @@ const ForgotPassword: React.FC = () => {
   const [emailSent, setEmailSent] = useState(false);
   const [sentEmail, setSentEmail] = useState('');
   const { forgotPassword, isLoading } = useAuthStore();
+  const { t } = useTranslation();
 
   const onFinish = async (values: { email: string }) => {
     try {
       await forgotPassword(values.email);
       setSentEmail(values.email);
       setEmailSent(true);
-      message.success('Password reset link sent!');
+      message.success(t('auth.resetLinkSent'));
     } catch (error) {
       message.error(getErrorMessage(error));
     }
@@ -29,24 +31,24 @@ const ForgotPassword: React.FC = () => {
       <div style={{ width: '100%', maxWidth: 400 }}>
         <Result
           status="success"
-          title="Check Your Email"
+          title={t('auth.checkYourEmail')}
           subTitle={
             <Paragraph>
-              We've sent a password reset link to <strong>{sentEmail}</strong>.
-              Please check your inbox and follow the instructions to reset your password.
+              {t('auth.resetLinkSentTo')} <strong>{sentEmail}</strong>.
+              {' '}{t('auth.checkInboxInstructions')}
             </Paragraph>
           }
           extra={[
             <Link to="/auth/login" key="login">
               <Button type="primary" icon={<ArrowLeftOutlined />}>
-                Back to Login
+                {t('auth.backToLogin')}
               </Button>
             </Link>,
             <Button
               key="resend"
               onClick={() => setEmailSent(false)}
             >
-              Send Again
+              {t('auth.sendAgain')}
             </Button>
           ]}
         />
@@ -58,10 +60,10 @@ const ForgotPassword: React.FC = () => {
     <div style={{ width: '100%', maxWidth: 400 }}>
       <div style={{ textAlign: 'center', marginBottom: 32 }}>
         <Title level={2} style={{ marginBottom: 8 }}>
-          Forgot Password?
+          {t('auth.forgotPasswordTitle')}
         </Title>
         <Text type="secondary">
-          Enter your email address and we'll send you a link to reset your password.
+          {t('auth.forgotPasswordDescription')}
         </Text>
       </div>
 
@@ -76,13 +78,13 @@ const ForgotPassword: React.FC = () => {
         <Form.Item
           name="email"
           rules={[
-            { required: true, message: 'Please enter your email' },
-            { type: 'email', message: 'Please enter a valid email' }
+            { required: true, message: t('validation.emailRequired') },
+            { type: 'email', message: t('validation.emailInvalid') }
           ]}
         >
           <Input
             prefix={<MailOutlined />}
-            placeholder="Email address"
+            placeholder={t('auth.emailAddress')}
           />
         </Form.Item>
 
@@ -93,14 +95,14 @@ const ForgotPassword: React.FC = () => {
             block
             loading={isLoading}
           >
-            Send Reset Link
+            {t('auth.sendResetLink')}
           </Button>
         </Form.Item>
 
         <div style={{ textAlign: 'center' }}>
           <Link to="/auth/login">
             <Button type="link" icon={<ArrowLeftOutlined />}>
-              Back to Login
+              {t('auth.backToLogin')}
             </Button>
           </Link>
         </div>

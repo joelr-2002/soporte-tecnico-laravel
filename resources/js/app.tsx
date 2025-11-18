@@ -1,10 +1,15 @@
 import '../css/app.css';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ConfigProvider, App as AntApp, theme } from 'antd';
 import { useAuthStore } from './stores/authStore';
+import { useSettingsStore, FontSize } from './stores/settingsStore';
+
+// Ant Design Locales
+import esES from 'antd/locale/es_ES';
+import enUS from 'antd/locale/en_US';
 
 // Layouts
 import AuthLayout from './layouts/AuthLayout';
@@ -18,41 +23,36 @@ import ResetPassword from './pages/auth/ResetPassword';
 
 // Protected Pages
 import Profile from './pages/Profile';
+import Settings from './pages/Settings';
+import Dashboard from './pages/Dashboard';
+import Reports from './pages/Reports';
+import Notifications from './pages/Notifications';
+
+// Ticket Pages
+import TicketList from './pages/tickets/TicketList';
+import TicketCreate from './pages/tickets/TicketCreate';
+import TicketView from './pages/tickets/TicketView';
+import TicketEdit from './pages/tickets/TicketEdit';
+
+// Admin Pages
+import Users from './pages/admin/Users';
+import Categories from './pages/admin/Categories';
+import ResponseTemplates from './pages/admin/ResponseTemplates';
 
 // Components
 import ProtectedRoute from './components/common/ProtectedRoute';
 
+// Font size mapping
+const fontSizeMap: Record<FontSize, number> = {
+  small: 12,
+  medium: 14,
+  large: 16,
+  xlarge: 18,
+};
+
 const appName = import.meta.env.VITE_APP_NAME || 'Support Ticket System';
 
-// Placeholder components for routes that will be implemented later
-const Dashboard: React.FC = () => (
-  <div>
-    <h1>Dashboard</h1>
-    <p>Welcome to the Support Ticket System</p>
-  </div>
-);
-
-const TicketList: React.FC = () => (
-  <div>
-    <h1>All Tickets</h1>
-    <p>Ticket list will be implemented here</p>
-  </div>
-);
-
-const CreateTicket: React.FC = () => (
-  <div>
-    <h1>Create Ticket</h1>
-    <p>Create ticket form will be implemented here</p>
-  </div>
-);
-
-const AssignedTickets: React.FC = () => (
-  <div>
-    <h1>Assigned to Me</h1>
-    <p>Assigned tickets will be shown here</p>
-  </div>
-);
-
+// Error Pages
 const NotFound: React.FC = () => (
   <div style={{ textAlign: 'center', padding: '50px' }}>
     <h1>404 - Page Not Found</h1>
@@ -104,22 +104,18 @@ const MainApp: React.FC = () => {
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="reports" element={<Reports />} />
+        <Route path="notifications" element={<Notifications />} />
+        <Route path="settings" element={<Settings />} />
 
         {/* Ticket Routes */}
         <Route path="tickets">
+          <Route index element={<TicketList />} />
           <Route path="list" element={<TicketList />} />
-          <Route path="create" element={<CreateTicket />} />
+          <Route path="create" element={<TicketCreate />} />
+          <Route path=":id" element={<TicketView />} />
+          <Route path=":id/edit" element={<TicketEdit />} />
         </Route>
-
-        {/* Agent/Admin Routes */}
-        <Route
-          path="assigned"
-          element={
-            <ProtectedRoute roles={['admin', 'agent']}>
-              <AssignedTickets />
-            </ProtectedRoute>
-          }
-        />
 
         {/* Admin Routes */}
         <Route path="admin">
@@ -127,7 +123,7 @@ const MainApp: React.FC = () => {
             path="users"
             element={
               <ProtectedRoute roles={['admin']}>
-                <div><h1>User Management</h1></div>
+                <Users />
               </ProtectedRoute>
             }
           />
@@ -135,45 +131,19 @@ const MainApp: React.FC = () => {
             path="categories"
             element={
               <ProtectedRoute roles={['admin']}>
-                <div><h1>Category Management</h1></div>
+                <Categories />
               </ProtectedRoute>
             }
           />
           <Route
-            path="departments"
+            path="response-templates"
             element={
-              <ProtectedRoute roles={['admin']}>
-                <div><h1>Department Management</h1></div>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="settings"
-            element={
-              <ProtectedRoute roles={['admin']}>
-                <div><h1>System Settings</h1></div>
+              <ProtectedRoute roles={['admin', 'agent']}>
+                <ResponseTemplates />
               </ProtectedRoute>
             }
           />
         </Route>
-
-        {/* Knowledge Base */}
-        <Route
-          path="knowledge-base"
-          element={<div><h1>Knowledge Base</h1></div>}
-        />
-
-        {/* Settings */}
-        <Route
-          path="settings"
-          element={<div><h1>User Settings</h1></div>}
-        />
-
-        {/* Notifications */}
-        <Route
-          path="notifications"
-          element={<div><h1>Notifications</h1></div>}
-        />
       </Route>
 
       {/* Error Pages */}
@@ -185,25 +155,83 @@ const MainApp: React.FC = () => {
 
 // Root App with Providers
 const App: React.FC = () => {
+  const {
+    effectiveTheme,
+    language,
+    fontSize,
+    highContrast,
+    reducedMotion,
+    updateEffectiveTheme,
+  } = useSettingsStore();
+
+  // Listen to system theme preference changes
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    const handleChange = () => {
+      updateEffectiveTheme();
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, [updateEffectiveTheme]);
+
+  // Apply global CSS for font size and reduced motion
+  useEffect(() => {
+    const baseFontSize = fontSizeMap[fontSize];
+    document.documentElement.style.setProperty('--app-font-size', `${baseFontSize}px`);
+    document.documentElement.style.fontSize = `${baseFontSize}px`;
+
+    // Apply reduced motion
+    if (reducedMotion) {
+      document.documentElement.classList.add('reduce-motion');
+    } else {
+      document.documentElement.classList.remove('reduce-motion');
+    }
+
+    // Apply high contrast
+    if (highContrast) {
+      document.documentElement.classList.add('high-contrast');
+    } else {
+      document.documentElement.classList.remove('high-contrast');
+    }
+  }, [fontSize, reducedMotion, highContrast]);
+
+  // Select locale based on language setting
+  const locale = language === 'es' ? esES : enUS;
+
+  // Build theme configuration based on settings
+  const themeConfig = useMemo(() => {
+    const baseFontSize = fontSizeMap[fontSize];
+    const isDark = effectiveTheme === 'dark';
+
+    return {
+      algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm,
+      token: {
+        colorPrimary: '#1890ff',
+        borderRadius: 6,
+        fontSize: baseFontSize,
+        // High contrast adjustments
+        ...(highContrast && {
+          colorText: isDark ? '#ffffff' : '#000000',
+          colorTextSecondary: isDark ? '#d9d9d9' : '#262626',
+          colorBorder: isDark ? '#595959' : '#434343',
+        }),
+      },
+      components: {
+        Layout: {
+          siderBg: isDark ? '#000000' : '#001529',
+          headerBg: isDark ? '#141414' : '#ffffff',
+        },
+        Menu: {
+          darkItemBg: isDark ? '#000000' : '#001529',
+        },
+      },
+    };
+  }, [effectiveTheme, fontSize, highContrast]);
+
   return (
-    <ConfigProvider
-      theme={{
-        algorithm: theme.defaultAlgorithm,
-        token: {
-          colorPrimary: '#1890ff',
-          borderRadius: 6,
-        },
-        components: {
-          Layout: {
-            siderBg: '#001529',
-            headerBg: '#ffffff',
-          },
-          Menu: {
-            darkItemBg: '#001529',
-          },
-        },
-      }}
-    >
+    <ConfigProvider theme={themeConfig} locale={locale}>
       <AntApp>
         <BrowserRouter>
           <MainApp />
