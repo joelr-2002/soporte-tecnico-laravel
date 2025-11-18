@@ -2,7 +2,7 @@ import React from 'react';
 import { Layout, Card, Typography } from 'antd';
 import { Outlet, Navigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
-import { useTranslation } from '../hooks/useSettings';
+import { useTranslation } from '../i18n';
 
 const { Content } = Layout;
 const { Title } = Typography;

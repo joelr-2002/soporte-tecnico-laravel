@@ -26,7 +26,7 @@ import {
 } from '@ant-design/icons';
 import { Outlet, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
-import { useTranslation } from '../hooks/useSettings';
+import { useTranslation } from '../i18n';
 import type { MenuProps } from 'antd';
 
 const { Header, Sider, Content } = Layout;
