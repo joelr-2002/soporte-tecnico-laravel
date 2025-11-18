@@ -8,6 +8,7 @@ use App\Http\Requests\Api\UpdateCommentRequest;
 use App\Http\Resources\CommentResource;
 use App\Models\Comment;
 use App\Models\Ticket;
+use App\Observers\TicketObserver;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -77,6 +78,11 @@ class CommentController extends Controller
             if (!$request->user()->isClient()) {
                 $ticket->update(['status' => Ticket::STATUS_IN_PROGRESS]);
             }
+        }
+
+        // Mark first response for SLA tracking (only for non-client, non-internal comments)
+        if (!$request->user()->isClient() && !$request->boolean('is_internal', false)) {
+            TicketObserver::markFirstResponse($ticket);
         }
 
         $comment->load(['user', 'attachments']);

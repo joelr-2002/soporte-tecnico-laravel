@@ -112,6 +112,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/response-templates', function () {
             return Inertia::render('admin/ResponseTemplates');
         })->name('response-templates');
+
+        Route::get('/slas', function () {
+            return Inertia::render('admin/Slas');
+        })->name('slas');
     });
 });
 

@@ -42,10 +42,17 @@ class Ticket extends Model
         'user_id',
         'assigned_to',
         'category_id',
+        'sla_id',
         'title',
         'description',
         'priority',
         'status',
+        'first_response_at',
+        'sla_response_due_at',
+        'sla_resolution_due_at',
+        'sla_response_breached',
+        'sla_resolution_breached',
+        'resolved_at',
     ];
 
     /**
@@ -58,6 +65,12 @@ class Ticket extends Model
         return [
             'priority' => 'string',
             'status' => 'string',
+            'first_response_at' => 'datetime',
+            'sla_response_due_at' => 'datetime',
+            'sla_resolution_due_at' => 'datetime',
+            'sla_response_breached' => 'boolean',
+            'sla_resolution_breached' => 'boolean',
+            'resolved_at' => 'datetime',
         ];
     }
 
@@ -109,6 +122,103 @@ class Ticket extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Get the SLA associated with the ticket.
+     */
+    public function sla(): BelongsTo
+    {
+        return $this->belongsTo(Sla::class);
+    }
+
+    /**
+     * Check if the SLA response time is breached.
+     */
+    public function isResponseBreached(): bool
+    {
+        if ($this->first_response_at) {
+            return false;
+        }
+
+        return $this->sla_response_due_at && now()->isAfter($this->sla_response_due_at);
+    }
+
+    /**
+     * Check if the SLA resolution time is breached.
+     */
+    public function isResolutionBreached(): bool
+    {
+        if ($this->resolved_at) {
+            return false;
+        }
+
+        return $this->sla_resolution_due_at && now()->isAfter($this->sla_resolution_due_at);
+    }
+
+    /**
+     * Get the remaining time for response SLA in minutes.
+     */
+    public function getResponseTimeRemainingAttribute(): ?int
+    {
+        if (!$this->sla_response_due_at || $this->first_response_at) {
+            return null;
+        }
+
+        $remaining = now()->diffInMinutes($this->sla_response_due_at, false);
+        return (int) $remaining;
+    }
+
+    /**
+     * Get the remaining time for resolution SLA in minutes.
+     */
+    public function getResolutionTimeRemainingAttribute(): ?int
+    {
+        if (!$this->sla_resolution_due_at || $this->resolved_at) {
+            return null;
+        }
+
+        $remaining = now()->diffInMinutes($this->sla_resolution_due_at, false);
+        return (int) $remaining;
+    }
+
+    /**
+     * Get the SLA status for the ticket.
+     */
+    public function getSlaStatusAttribute(): string
+    {
+        if ($this->sla_response_breached || $this->sla_resolution_breached) {
+            return 'breached';
+        }
+
+        if ($this->isResponseBreached() || $this->isResolutionBreached()) {
+            return 'breached';
+        }
+
+        $responseRemaining = $this->response_time_remaining;
+        $resolutionRemaining = $this->resolution_time_remaining;
+
+        // If no SLA assigned or all completed
+        if ($responseRemaining === null && $resolutionRemaining === null) {
+            return 'ok';
+        }
+
+        // Check if any is at risk (less than 30% time remaining)
+        if ($responseRemaining !== null && $responseRemaining > 0) {
+            $totalResponseTime = $this->sla?->response_time ?? 0;
+            if ($totalResponseTime > 0 && ($responseRemaining / $totalResponseTime) < 0.3) {
+                return 'at_risk';
+            }
+        }
+
+        if ($resolutionRemaining !== null && $resolutionRemaining > 0) {
+            $totalResolutionTime = $this->sla?->resolution_time ?? 0;
+            if ($totalResolutionTime > 0 && ($resolutionRemaining / $totalResolutionTime) < 0.3) {
+                return 'at_risk';
+            }
+        }
+
+        return 'ok';
     }
 
     /**
