@@ -55,7 +55,7 @@ export const useAuthStore = create<AuthStore>()(
       login: async (credentials) => {
         set({ isLoading: true });
         try {
-          const response = await api.post('/auth/login', credentials);
+          const response = await api.post('/login', credentials);
           const { user, token } = response.data;
 
           set({
@@ -74,7 +74,7 @@ export const useAuthStore = create<AuthStore>()(
       register: async (data) => {
         set({ isLoading: true });
         try {
-          const response = await api.post('/auth/register', data);
+          const response = await api.post('/register', data);
           const { user, token } = response.data;
 
           set({
@@ -93,7 +93,7 @@ export const useAuthStore = create<AuthStore>()(
       logout: async () => {
         set({ isLoading: true });
         try {
-          await api.post('/auth/logout');
+          await api.post('/logout');
         } catch (error) {
           // Continue with logout even if API call fails
           console.error('Logout API error:', error);
@@ -112,7 +112,7 @@ export const useAuthStore = create<AuthStore>()(
 
         set({ isLoading: true });
         try {
-          const response = await api.get('/auth/user');
+          const response = await api.get('/user');
           set({
             user: response.data.user || response.data,
             isAuthenticated: true,
@@ -134,7 +134,7 @@ export const useAuthStore = create<AuthStore>()(
           if (data.phone) formData.append('phone', data.phone);
           if (data.photo) formData.append('photo', data.photo);
 
-          const response = await api.post('/auth/profile', formData, {
+          const response = await api.put('/user/profile', formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
@@ -153,7 +153,7 @@ export const useAuthStore = create<AuthStore>()(
       changePassword: async (data) => {
         set({ isLoading: true });
         try {
-          await api.put('/auth/password', data);
+          await api.put('/user/password', data);
           set({ isLoading: false });
         } catch (error) {
           set({ isLoading: false });
@@ -167,7 +167,7 @@ export const useAuthStore = create<AuthStore>()(
           const formData = new FormData();
           formData.append('photo', file);
 
-          const response = await api.post('/auth/photo', formData, {
+          const response = await api.put('/user/profile', formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
@@ -189,7 +189,7 @@ export const useAuthStore = create<AuthStore>()(
       forgotPassword: async (email) => {
         set({ isLoading: true });
         try {
-          await api.post('/auth/forgot-password', { email });
+          await api.post('/forgot-password', { email });
           set({ isLoading: false });
         } catch (error) {
           set({ isLoading: false });
@@ -200,7 +200,7 @@ export const useAuthStore = create<AuthStore>()(
       resetPassword: async (data) => {
         set({ isLoading: true });
         try {
-          await api.post('/auth/reset-password', data);
+          await api.post('/reset-password', data);
           set({ isLoading: false });
         } catch (error) {
           set({ isLoading: false });

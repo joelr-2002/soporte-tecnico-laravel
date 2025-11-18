@@ -141,3 +141,38 @@
         @apply bg-background text-foreground;
     }
 }
+
+/* Accessibility: Reduced Motion */
+.reduce-motion,
+.reduce-motion * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+}
+
+/* Accessibility: High Contrast */
+.high-contrast {
+    filter: contrast(1.25);
+}
+
+.high-contrast img,
+.high-contrast video {
+    filter: contrast(0.8);
+}
+
+/* Font Size Variable */
+:root {
+    --app-font-size: 14px;
+}
+
+/* Ant Design overrides for font scaling */
+.ant-typography,
+.ant-btn,
+.ant-input,
+.ant-select,
+.ant-form-item-label,
+.ant-menu-item,
+.ant-tabs-tab {
+    font-size: inherit;
+}

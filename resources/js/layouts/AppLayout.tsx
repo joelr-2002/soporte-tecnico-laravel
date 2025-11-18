@@ -26,6 +26,7 @@ import {
 } from '@ant-design/icons';
 import { Outlet, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
+import { useTranslation } from '../i18n';
 import type { MenuProps } from 'antd';
 
 const { Header, Sider, Content } = Layout;
@@ -38,6 +39,7 @@ const AppLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { token } = theme.useToken();
+  const { t } = useTranslation();
 
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
@@ -50,21 +52,21 @@ const AppLayout: React.FC = () => {
       {
         key: '/dashboard',
         icon: <DashboardOutlined />,
-        label: 'Dashboard',
+        label: t('menu.dashboard'),
       },
       {
         key: '/tickets',
         icon: <FileTextOutlined />,
-        label: 'Tickets',
+        label: t('menu.tickets'),
         children: [
           {
             key: '/tickets/list',
-            label: 'All Tickets',
+            label: t('menu.allTickets'),
           },
           {
             key: '/tickets/create',
             icon: <PlusOutlined />,
-            label: 'Create Ticket',
+            label: t('menu.createTicket'),
           },
         ],
       },
@@ -75,7 +77,7 @@ const AppLayout: React.FC = () => {
       items.push({
         key: '/assigned',
         icon: <TeamOutlined />,
-        label: 'Assigned to Me',
+        label: t('menu.assignedToMe'),
       });
     }
 
@@ -85,26 +87,26 @@ const AppLayout: React.FC = () => {
         {
           key: '/admin',
           icon: <SettingOutlined />,
-          label: 'Administration',
+          label: t('menu.administration'),
           children: [
             {
               key: '/admin/users',
               icon: <TeamOutlined />,
-              label: 'Users',
+              label: t('menu.users'),
             },
             {
               key: '/admin/categories',
               icon: <AppstoreOutlined />,
-              label: 'Categories',
+              label: t('menu.categories'),
             },
             {
               key: '/admin/departments',
-              label: 'Departments',
+              label: t('menu.departments'),
             },
             {
               key: '/admin/settings',
               icon: <SettingOutlined />,
-              label: 'Settings',
+              label: t('menu.settings'),
             },
           ],
         }
@@ -115,7 +117,7 @@ const AppLayout: React.FC = () => {
     items.push({
       key: '/knowledge-base',
       icon: <QuestionCircleOutlined />,
-      label: 'Knowledge Base',
+      label: t('menu.knowledgeBase'),
     });
 
     return items;
@@ -125,13 +127,13 @@ const AppLayout: React.FC = () => {
     {
       key: 'profile',
       icon: <UserOutlined />,
-      label: 'My Profile',
+      label: t('userMenu.myProfile'),
       onClick: () => navigate('/profile'),
     },
     {
       key: 'settings',
       icon: <SettingOutlined />,
-      label: 'Settings',
+      label: t('userMenu.settings'),
       onClick: () => navigate('/settings'),
     },
     {
@@ -140,7 +142,7 @@ const AppLayout: React.FC = () => {
     {
       key: 'logout',
       icon: <LogoutOutlined />,
-      label: 'Logout',
+      label: t('userMenu.logout'),
       onClick: async () => {
         await logout();
         navigate('/auth/login');
@@ -198,7 +200,7 @@ const AppLayout: React.FC = () => {
               whiteSpace: 'nowrap',
             }}
           >
-            {collapsed ? 'ST' : 'Support Tickets'}
+            {collapsed ? t('app.titleShort') : t('app.titleSidebar')}
           </Typography.Title>
         </div>
         <Menu

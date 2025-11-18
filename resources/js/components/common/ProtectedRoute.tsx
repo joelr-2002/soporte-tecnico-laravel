@@ -23,7 +23,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, roles }) => {
           height: '100vh',
         }}
       >
-        <Spin size="large" tip="Loading..." />
+        <Spin size="large" />
       </div>
     );
   }

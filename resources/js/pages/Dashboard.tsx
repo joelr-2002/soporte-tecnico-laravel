@@ -32,6 +32,7 @@ import { Pie, Column, Line } from '@ant-design/charts';
 import { Link } from 'react-router-dom';
 import ticketService, { StatisticsResponse } from '../services/ticketService';
 import { useAuthStore } from '../stores/authStore';
+import { useTranslation } from '../i18n';
 import { Ticket } from '../types';
 import type { ColumnsType } from 'antd/es/table';
 
@@ -68,6 +69,7 @@ interface AgentPerformance {
 
 const Dashboard: React.FC = () => {
   const { user } = useAuthStore();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [statistics, setStatistics] = useState<StatisticsResponse['data'] | null>(null);
   const [recentTickets, setRecentTickets] = useState<Ticket[]>([]);
@@ -85,7 +87,7 @@ const Dashboard: React.FC = () => {
       setRecentTickets(stats.recent_tickets || []);
       setUrgentTickets(stats.urgent_tickets || []);
     } catch (error) {
-      message.error('Failed to load dashboard data');
+      message.error(t('dashboard.loadError'));
       console.error('Dashboard error:', error);
     } finally {
       setLoading(false);
@@ -123,7 +125,7 @@ const Dashboard: React.FC = () => {
   // Table columns for recent tickets
   const ticketColumns: ColumnsType<Ticket> = [
     {
-      title: 'Ticket #',
+      title: t('dashboard.ticketNumber'),
       dataIndex: 'ticket_number',
       key: 'ticket_number',
       render: (text: string, record: Ticket) => (
@@ -133,7 +135,7 @@ const Dashboard: React.FC = () => {
       ),
     },
     {
-      title: 'Title',
+      title: t('dashboard.title'),
       dataIndex: 'title',
       key: 'title',
       ellipsis: true,
@@ -144,7 +146,7 @@ const Dashboard: React.FC = () => {
       ),
     },
     {
-      title: 'Status',
+      title: t('dashboard.status'),
       dataIndex: 'status',
       key: 'status',
       render: (status: string) => (
@@ -152,7 +154,7 @@ const Dashboard: React.FC = () => {
       ),
     },
     {
-      title: 'Priority',
+      title: t('dashboard.priority'),
       dataIndex: 'priority',
       key: 'priority',
       render: (priority: string) => (
@@ -160,18 +162,18 @@ const Dashboard: React.FC = () => {
       ),
     },
     {
-      title: 'Created',
+      title: t('dashboard.created'),
       dataIndex: 'created_at',
       key: 'created_at',
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
     {
-      title: 'Actions',
+      title: t('dashboard.actions'),
       key: 'actions',
       render: (_: unknown, record: Ticket) => (
         <Link to={`/tickets/${record.id}`}>
           <Button type="link" icon={<EyeOutlined />} size="small">
-            View
+            {t('common.view')}
           </Button>
         </Link>
       ),
@@ -230,8 +232,8 @@ const Dashboard: React.FC = () => {
       },
     },
     meta: {
-      category: { alias: 'Category' },
-      count: { alias: 'Tickets' },
+      category: { alias: t('dashboard.category') },
+      count: { alias: t('dashboard.tickets') },
     },
   };
 
@@ -257,29 +259,29 @@ const Dashboard: React.FC = () => {
       tickCount: 5,
     },
     meta: {
-      date: { alias: 'Date' },
-      count: { alias: 'Tickets Created' },
+      date: { alias: t('dashboard.date') },
+      count: { alias: t('dashboard.ticketsCreated') },
     },
   };
 
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <Spin size="large" tip="Loading dashboard..." />
+        <Spin size="large" tip={t('dashboard.loading')} />
       </div>
     );
   }
 
   return (
     <div style={{ padding: '24px' }}>
-      <Title level={2}>Dashboard</Title>
+      <Title level={2}>{t('dashboard.title')}</Title>
 
       {/* Statistics Cards */}
       <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
         <Col xs={24} sm={12} lg={6}>
           <Card>
             <Statistic
-              title="Total Tickets"
+              title={t('dashboard.totalTickets')}
               value={statistics?.total_tickets || 0}
               prefix={<FileTextOutlined style={{ color: '#1890ff' }} />}
               valueStyle={{ color: '#1890ff' }}
@@ -289,7 +291,7 @@ const Dashboard: React.FC = () => {
         <Col xs={24} sm={12} lg={6}>
           <Card>
             <Statistic
-              title="Open Tickets"
+              title={t('dashboard.openTickets')}
               value={statistics?.open_tickets || 0}
               prefix={<ClockCircleOutlined style={{ color: '#52c41a' }} />}
               valueStyle={{ color: '#52c41a' }}
@@ -299,7 +301,7 @@ const Dashboard: React.FC = () => {
         <Col xs={24} sm={12} lg={6}>
           <Card>
             <Statistic
-              title="In Progress"
+              title={t('dashboard.inProgress')}
               value={statistics?.in_progress_tickets || 0}
               prefix={<SyncOutlined spin style={{ color: '#fa8c16' }} />}
               valueStyle={{ color: '#fa8c16' }}
@@ -309,7 +311,7 @@ const Dashboard: React.FC = () => {
         <Col xs={24} sm={12} lg={6}>
           <Card>
             <Statistic
-              title="Resolved"
+              title={t('dashboard.resolved')}
               value={statistics?.resolved_tickets || 0}
               prefix={<CheckCircleOutlined style={{ color: '#722ed1' }} />}
               valueStyle={{ color: '#722ed1' }}
@@ -324,7 +326,7 @@ const Dashboard: React.FC = () => {
           <Col xs={24} sm={8}>
             <Card>
               <Statistic
-                title="My Assigned Tickets"
+                title={t('dashboard.myAssignedTickets')}
                 value={statistics.agent_stats.assigned_count}
                 prefix={<UserOutlined style={{ color: '#13c2c2' }} />}
                 valueStyle={{ color: '#13c2c2' }}
@@ -334,7 +336,7 @@ const Dashboard: React.FC = () => {
           <Col xs={24} sm={8}>
             <Card>
               <Statistic
-                title="Resolved This Week"
+                title={t('dashboard.resolvedThisWeek')}
                 value={statistics.agent_stats.resolved_this_week}
                 prefix={<RocketOutlined style={{ color: '#eb2f96' }} />}
                 valueStyle={{ color: '#eb2f96' }}
@@ -344,9 +346,9 @@ const Dashboard: React.FC = () => {
           <Col xs={24} sm={8}>
             <Card>
               <Statistic
-                title="Avg Resolution Time"
+                title={t('dashboard.avgResolutionTime')}
                 value={statistics.agent_stats.avg_resolution_time}
-                suffix="hours"
+                suffix={t('dashboard.hours')}
                 prefix={<ClockCircleOutlined style={{ color: '#faad14' }} />}
                 valueStyle={{ color: '#faad14' }}
               />
@@ -362,7 +364,7 @@ const Dashboard: React.FC = () => {
             <Col xs={24} sm={8}>
               <Card>
                 <Statistic
-                  title="Unassigned Tickets"
+                  title={t('dashboard.unassignedTickets')}
                   value={statistics.admin_stats.unassigned_count}
                   prefix={<ExclamationCircleOutlined style={{ color: '#f5222d' }} />}
                   valueStyle={{ color: '#f5222d' }}
@@ -372,7 +374,7 @@ const Dashboard: React.FC = () => {
             <Col xs={24} sm={8}>
               <Card>
                 <Statistic
-                  title="Total Users"
+                  title={t('dashboard.totalUsers')}
                   value={statistics.admin_stats.total_users}
                   prefix={<TeamOutlined style={{ color: '#1890ff' }} />}
                   valueStyle={{ color: '#1890ff' }}
@@ -382,7 +384,7 @@ const Dashboard: React.FC = () => {
             <Col xs={24} sm={8}>
               <Card>
                 <Statistic
-                  title="Total Agents"
+                  title={t('dashboard.totalAgents')}
                   value={statistics.admin_stats.total_agents}
                   prefix={<UserOutlined style={{ color: '#52c41a' }} />}
                   valueStyle={{ color: '#52c41a' }}
@@ -393,7 +395,7 @@ const Dashboard: React.FC = () => {
 
           {/* Agent Performance Summary */}
           {statistics.admin_stats.agent_performance && statistics.admin_stats.agent_performance.length > 0 && (
-            <Card title="Agent Performance Summary" style={{ marginBottom: '24px' }}>
+            <Card title={t('dashboard.agentPerformanceSummary')} style={{ marginBottom: '24px' }}>
               <Table
                 dataSource={statistics.admin_stats.agent_performance}
                 rowKey="agent_id"
@@ -401,7 +403,7 @@ const Dashboard: React.FC = () => {
                 size="small"
                 columns={[
                   {
-                    title: 'Agent',
+                    title: t('dashboard.agent'),
                     dataIndex: 'agent_name',
                     key: 'agent_name',
                     render: (name: string) => (
@@ -412,13 +414,13 @@ const Dashboard: React.FC = () => {
                     ),
                   },
                   {
-                    title: 'Assigned',
+                    title: t('dashboard.assigned'),
                     dataIndex: 'assigned',
                     key: 'assigned',
                     align: 'center',
                   },
                   {
-                    title: 'Resolved',
+                    title: t('dashboard.resolved'),
                     dataIndex: 'resolved',
                     key: 'resolved',
                     align: 'center',
@@ -427,7 +429,7 @@ const Dashboard: React.FC = () => {
                     ),
                   },
                   {
-                    title: 'Avg Resolution (hrs)',
+                    title: t('dashboard.avgResolutionHours'),
                     dataIndex: 'avg_resolution_time',
                     key: 'avg_resolution_time',
                     align: 'center',
@@ -443,26 +445,26 @@ const Dashboard: React.FC = () => {
       {/* Charts Section */}
       <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
         <Col xs={24} lg={12}>
-          <Card title="Tickets by Status" extra={<BarChartOutlined />}>
+          <Card title={t('dashboard.ticketsByStatus')} extra={<BarChartOutlined />}>
             <div style={{ height: 300 }}>
               {statistics?.tickets_by_status && statistics.tickets_by_status.length > 0 ? (
                 <Pie {...statusPieConfig} />
               ) : (
                 <div style={{ textAlign: 'center', paddingTop: '100px' }}>
-                  <Text type="secondary">No data available</Text>
+                  <Text type="secondary">{t('dashboard.noDataAvailable')}</Text>
                 </div>
               )}
             </div>
           </Card>
         </Col>
         <Col xs={24} lg={12}>
-          <Card title="Tickets by Priority" extra={<BarChartOutlined />}>
+          <Card title={t('dashboard.ticketsByPriority')} extra={<BarChartOutlined />}>
             <div style={{ height: 300 }}>
               {statistics?.tickets_by_priority && statistics.tickets_by_priority.length > 0 ? (
                 <Pie {...priorityPieConfig} />
               ) : (
                 <div style={{ textAlign: 'center', paddingTop: '100px' }}>
-                  <Text type="secondary">No data available</Text>
+                  <Text type="secondary">{t('dashboard.noDataAvailable')}</Text>
                 </div>
               )}
             </div>
@@ -472,26 +474,26 @@ const Dashboard: React.FC = () => {
 
       <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
         <Col xs={24} lg={12}>
-          <Card title="Tickets by Category" extra={<BarChartOutlined />}>
+          <Card title={t('dashboard.ticketsByCategory')} extra={<BarChartOutlined />}>
             <div style={{ height: 300 }}>
               {statistics?.tickets_by_category && statistics.tickets_by_category.length > 0 ? (
                 <Column {...categoryBarConfig} />
               ) : (
                 <div style={{ textAlign: 'center', paddingTop: '100px' }}>
-                  <Text type="secondary">No data available</Text>
+                  <Text type="secondary">{t('dashboard.noDataAvailable')}</Text>
                 </div>
               )}
             </div>
           </Card>
         </Col>
         <Col xs={24} lg={12}>
-          <Card title="Tickets Created (Last 30 Days)" extra={<BarChartOutlined />}>
+          <Card title={t('dashboard.ticketsCreatedLast30Days')} extra={<BarChartOutlined />}>
             <div style={{ height: 300 }}>
               {statistics?.tickets_over_time && statistics.tickets_over_time.length > 0 ? (
                 <Line {...timeLineConfig} />
               ) : (
                 <div style={{ textAlign: 'center', paddingTop: '100px' }}>
-                  <Text type="secondary">No data available</Text>
+                  <Text type="secondary">{t('dashboard.noDataAvailable')}</Text>
                 </div>
               )}
             </div>
@@ -503,10 +505,10 @@ const Dashboard: React.FC = () => {
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={14}>
           <Card
-            title="Recent Tickets"
+            title={t('dashboard.recentTickets')}
             extra={
               <Link to="/tickets">
-                <Button type="link">View All</Button>
+                <Button type="link">{t('common.viewAll')}</Button>
               </Link>
             }
           >
@@ -516,7 +518,7 @@ const Dashboard: React.FC = () => {
               rowKey="id"
               pagination={false}
               size="small"
-              locale={{ emptyText: 'No recent tickets' }}
+              locale={{ emptyText: t('dashboard.noRecentTickets') }}
             />
           </Card>
         </Col>
@@ -525,29 +527,29 @@ const Dashboard: React.FC = () => {
             title={
               <Space>
                 <AlertOutlined style={{ color: '#f5222d' }} />
-                Urgent Tickets
+                {t('dashboard.urgentTickets')}
               </Space>
             }
             extra={
               <Link to="/tickets?priority=urgent,high">
-                <Button type="link">View All</Button>
+                <Button type="link">{t('common.viewAll')}</Button>
               </Link>
             }
           >
             <List
               dataSource={urgentTickets}
-              locale={{ emptyText: 'No urgent tickets' }}
+              locale={{ emptyText: t('dashboard.noUrgentTickets') }}
               renderItem={(ticket: Ticket) => (
                 <List.Item
                   actions={[
                     <Link key="view" to={`/tickets/${ticket.id}`}>
                       <Button type="primary" size="small" icon={<EyeOutlined />}>
-                        View
+                        {t('common.view')}
                       </Button>
                     </Link>,
                     user?.role !== 'user' && (
                       <Link key="assign" to={`/tickets/${ticket.id}`}>
-                        <Button size="small">Assign</Button>
+                        <Button size="small">{t('common.assign')}</Button>
                       </Link>
                     ),
                   ].filter(Boolean)}

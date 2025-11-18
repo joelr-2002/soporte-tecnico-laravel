@@ -39,6 +39,23 @@ Route::middleware('guest')->group(function () {
     Route::get('reset-password/{token}', function (string $token) {
         return Inertia::render('auth/ResetPassword', ['token' => $token]);
     })->name('password.reset');
+
+    // React Router compatible routes (with /auth prefix)
+    Route::get('auth/login', function () {
+        return Inertia::render('auth/Login');
+    });
+
+    Route::get('auth/register', function () {
+        return Inertia::render('auth/Register');
+    });
+
+    Route::get('auth/forgot-password', function () {
+        return Inertia::render('auth/ForgotPassword');
+    });
+
+    Route::get('auth/reset-password', function () {
+        return Inertia::render('auth/ResetPassword');
+    });
 });
 
 // Protected routes (require authentication)
