@@ -25,6 +25,7 @@ import type { UploadFile, UploadProps } from 'antd';
 import { useAuthStore } from '../stores/authStore';
 import { getErrorMessage } from '../services/api';
 import { UpdateProfileData, ChangePasswordData } from '../types';
+import { useTranslation } from '../i18n';
 
 const { Title, Text } = Typography;
 
@@ -33,6 +34,7 @@ const Profile: React.FC = () => {
   const [profileForm] = Form.useForm();
   const [passwordForm] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const { t } = useTranslation();
 
   const onUpdateProfile = async (values: UpdateProfileData) => {
     try {
@@ -47,7 +49,7 @@ const Profile: React.FC = () => {
       }
 
       await updateProfile(data);
-      message.success('Profile updated successfully!');
+      message.success(t('profile.profileUpdated'));
       setFileList([]);
     } catch (error) {
       message.error(getErrorMessage(error));
@@ -57,7 +59,7 @@ const Profile: React.FC = () => {
   const onChangePassword = async (values: ChangePasswordData) => {
     try {
       await changePassword(values);
-      message.success('Password changed successfully!');
+      message.success(t('profile.passwordChanged'));
       passwordForm.resetFields();
     } catch (error) {
       message.error(getErrorMessage(error));
@@ -71,12 +73,12 @@ const Profile: React.FC = () => {
     beforeUpload: (file) => {
       const isImage = file.type.startsWith('image/');
       if (!isImage) {
-        message.error('You can only upload image files!');
+        message.error(t('profile.onlyImages'));
         return false;
       }
       const isLt2M = file.size / 1024 / 1024 < 2;
       if (!isLt2M) {
-        message.error('Image must be smaller than 2MB!');
+        message.error(t('profile.imageTooLarge'));
         return false;
       }
       setFileList([file]);
@@ -90,7 +92,7 @@ const Profile: React.FC = () => {
     if (fileList.length > 0 && fileList[0].originFileObj) {
       try {
         await uploadPhoto(fileList[0].originFileObj);
-        message.success('Photo uploaded successfully!');
+        message.success(t('profile.photoUploaded'));
         setFileList([]);
       } catch (error) {
         message.error(getErrorMessage(error));
@@ -101,7 +103,7 @@ const Profile: React.FC = () => {
   const items = [
     {
       key: 'profile',
-      label: 'Profile Information',
+      label: t('profile.profileInformation'),
       children: (
         <div>
           <div style={{ textAlign: 'center', marginBottom: 24 }}>
@@ -114,7 +116,7 @@ const Profile: React.FC = () => {
             <div>
               <Space>
                 <Upload {...uploadProps}>
-                  <Button icon={<CameraOutlined />}>Select Photo</Button>
+                  <Button icon={<CameraOutlined />}>{t('profile.selectPhoto')}</Button>
                 </Upload>
                 {fileList.length > 0 && (
                   <Button
@@ -123,7 +125,7 @@ const Profile: React.FC = () => {
                     onClick={handlePhotoUpload}
                     loading={isLoading}
                   >
-                    Upload
+                    {t('profile.upload')}
                   </Button>
                 )}
               </Space>
@@ -144,36 +146,36 @@ const Profile: React.FC = () => {
           >
             <Form.Item
               name="name"
-              label="Full Name"
+              label={t('profile.fullName')}
               rules={[
-                { required: true, message: 'Please enter your name' },
-                { min: 2, message: 'Name must be at least 2 characters' }
+                { required: true, message: t('profile.enterName') },
+                { min: 2, message: t('profile.nameMinLength') }
               ]}
             >
-              <Input prefix={<UserOutlined />} placeholder="Full name" />
+              <Input prefix={<UserOutlined />} placeholder={t('placeholders.name')} />
             </Form.Item>
 
             <Form.Item
               name="email"
-              label="Email Address"
+              label={t('profile.emailAddress')}
               rules={[
-                { required: true, message: 'Please enter your email' },
-                { type: 'email', message: 'Please enter a valid email' }
+                { required: true, message: t('profile.enterEmail') },
+                { type: 'email', message: t('profile.validEmail') }
               ]}
             >
-              <Input prefix={<MailOutlined />} placeholder="Email address" />
+              <Input prefix={<MailOutlined />} placeholder={t('placeholders.email')} />
             </Form.Item>
 
             <Form.Item
               name="phone"
-              label="Phone Number"
+              label={t('profile.phoneNumber')}
             >
-              <Input prefix={<PhoneOutlined />} placeholder="Phone number (optional)" />
+              <Input prefix={<PhoneOutlined />} placeholder={t('placeholders.phone')} />
             </Form.Item>
 
             <Form.Item>
               <Button type="primary" htmlType="submit" loading={isLoading}>
-                Update Profile
+                {t('profile.updateProfile')}
               </Button>
             </Form.Item>
           </Form>
@@ -182,7 +184,7 @@ const Profile: React.FC = () => {
     },
     {
       key: 'password',
-      label: 'Change Password',
+      label: t('profile.changePassword'),
       children: (
         <Form
           form={passwordForm}
@@ -191,47 +193,47 @@ const Profile: React.FC = () => {
         >
           <Form.Item
             name="current_password"
-            label="Current Password"
+            label={t('profile.currentPassword')}
             rules={[
-              { required: true, message: 'Please enter your current password' }
+              { required: true, message: t('profile.enterCurrentPassword') }
             ]}
           >
-            <Input.Password prefix={<LockOutlined />} placeholder="Current password" />
+            <Input.Password prefix={<LockOutlined />} placeholder={t('placeholders.currentPassword')} />
           </Form.Item>
 
           <Form.Item
             name="password"
-            label="New Password"
+            label={t('profile.newPassword')}
             rules={[
-              { required: true, message: 'Please enter a new password' },
-              { min: 8, message: 'Password must be at least 8 characters' }
+              { required: true, message: t('profile.enterNewPassword') },
+              { min: 8, message: t('profile.passwordMinLength') }
             ]}
           >
-            <Input.Password prefix={<LockOutlined />} placeholder="New password" />
+            <Input.Password prefix={<LockOutlined />} placeholder={t('placeholders.newPassword')} />
           </Form.Item>
 
           <Form.Item
             name="password_confirmation"
-            label="Confirm New Password"
+            label={t('profile.confirmNewPassword')}
             dependencies={['password']}
             rules={[
-              { required: true, message: 'Please confirm your new password' },
+              { required: true, message: t('profile.confirmNewPasswordRequired') },
               ({ getFieldValue }) => ({
                 validator(_, value) {
                   if (!value || getFieldValue('password') === value) {
                     return Promise.resolve();
                   }
-                  return Promise.reject(new Error('Passwords do not match'));
+                  return Promise.reject(new Error(t('profile.passwordsDoNotMatch')));
                 },
               }),
             ]}
           >
-            <Input.Password prefix={<LockOutlined />} placeholder="Confirm new password" />
+            <Input.Password prefix={<LockOutlined />} placeholder={t('placeholders.confirmPassword')} />
           </Form.Item>
 
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={isLoading}>
-              Change Password
+              {t('profile.changePassword')}
             </Button>
           </Form.Item>
         </Form>
@@ -239,38 +241,38 @@ const Profile: React.FC = () => {
     },
     {
       key: 'account',
-      label: 'Account Details',
+      label: t('profile.accountDetails'),
       children: (
         <Descriptions bordered column={1}>
-          <Descriptions.Item label="User ID">{user?.id}</Descriptions.Item>
-          <Descriptions.Item label="Name">{user?.name}</Descriptions.Item>
-          <Descriptions.Item label="Email">{user?.email}</Descriptions.Item>
-          <Descriptions.Item label="Role">
+          <Descriptions.Item label={t('profile.userId')}>{user?.id}</Descriptions.Item>
+          <Descriptions.Item label={t('auth.name')}>{user?.name}</Descriptions.Item>
+          <Descriptions.Item label={t('auth.email')}>{user?.email}</Descriptions.Item>
+          <Descriptions.Item label={t('users.role')}>
             <Text style={{ textTransform: 'capitalize' }}>{user?.role}</Text>
           </Descriptions.Item>
-          <Descriptions.Item label="Phone">{user?.phone || 'Not provided'}</Descriptions.Item>
-          <Descriptions.Item label="Email Verified">
+          <Descriptions.Item label={t('auth.phone')}>{user?.phone || t('profile.notProvided')}</Descriptions.Item>
+          <Descriptions.Item label={t('profile.emailVerified')}>
             {user?.email_verified_at ? (
-              <Text type="success">Verified</Text>
+              <Text type="success">{t('profile.verified')}</Text>
             ) : (
-              <Text type="warning">Not verified</Text>
+              <Text type="warning">{t('profile.notVerified')}</Text>
             )}
           </Descriptions.Item>
-          <Descriptions.Item label="Two-Factor Auth">
+          <Descriptions.Item label={t('profile.twoFactorAuth')}>
             {user?.two_factor_enabled ? (
-              <Text type="success">Enabled</Text>
+              <Text type="success">{t('profile.enabled')}</Text>
             ) : (
-              <Text type="secondary">Disabled</Text>
+              <Text type="secondary">{t('profile.disabled')}</Text>
             )}
           </Descriptions.Item>
-          <Descriptions.Item label="Account Status">
+          <Descriptions.Item label={t('profile.accountStatus')}>
             {user?.is_active ? (
-              <Text type="success">Active</Text>
+              <Text type="success">{t('users.active')}</Text>
             ) : (
-              <Text type="danger">Inactive</Text>
+              <Text type="danger">{t('users.inactive')}</Text>
             )}
           </Descriptions.Item>
-          <Descriptions.Item label="Member Since">
+          <Descriptions.Item label={t('users.memberSince')}>
             {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
           </Descriptions.Item>
         </Descriptions>
@@ -282,7 +284,7 @@ const Profile: React.FC = () => {
     <div style={{ maxWidth: 800, margin: '0 auto' }}>
       <Card>
         <Title level={3} style={{ marginBottom: 24 }}>
-          My Profile
+          {t('profile.myProfile')}
         </Title>
         <Tabs items={items} />
       </Card>

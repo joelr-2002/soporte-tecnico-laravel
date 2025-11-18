@@ -27,6 +27,7 @@ import {
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import api, { getErrorMessage } from '../../services/api';
 import categoryService from '../../services/categoryService';
+import { useTranslation } from '../../i18n';
 import { Category } from '../../types';
 
 const { Title, Text, Paragraph } = Typography;
@@ -51,6 +52,7 @@ interface TemplateFormData {
 }
 
 const ResponseTemplates: React.FC = () => {
+  const { t } = useTranslation();
   // Data states
   const [templates, setTemplates] = useState<ResponseTemplate[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);

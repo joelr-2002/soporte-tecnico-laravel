@@ -27,11 +27,13 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import categoryService, { CategoryWithStats, CategoryFormData } from '../../services/categoryService';
+import { useTranslation } from '../../i18n';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
 const Categories: React.FC = () => {
+  const { t } = useTranslation();
   // Data states
   const [categories, setCategories] = useState<CategoryWithStats[]>([]);
   const [loading, setLoading] = useState(false);
@@ -272,7 +274,7 @@ const Categories: React.FC = () => {
         <Row gutter={16}>
           <Col xs={24} sm={12} md={8}>
             <Input
-              placeholder="Search categories..."
+              placeholder={t('placeholders.search')}
               prefix={<SearchOutlined />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
