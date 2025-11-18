@@ -4,16 +4,99 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application.
+| These routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group.
+|
+*/
+
+// Public routes
 Route::get('/', function () {
     return Inertia::render('welcome', [
         'canRegister' => Features::enabled(Features::registration()),
     ]);
 })->name('home');
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+// Guest routes (authentication pages)
+Route::middleware('guest')->group(function () {
+    Route::get('login', function () {
+        return Inertia::render('auth/Login');
+    })->name('login');
+
+    Route::get('register', function () {
+        return Inertia::render('auth/Register');
+    })->name('register');
+
+    Route::get('forgot-password', function () {
+        return Inertia::render('auth/ForgotPassword');
+    })->name('password.request');
+
+    Route::get('reset-password/{token}', function (string $token) {
+        return Inertia::render('auth/ResetPassword', ['token' => $token]);
+    })->name('password.reset');
 });
 
+// Protected routes (require authentication)
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Dashboard
+    Route::get('dashboard', function () {
+        return Inertia::render('Dashboard');
+    })->name('dashboard');
+
+    // Tickets
+    Route::prefix('tickets')->name('tickets.')->group(function () {
+        Route::get('/', function () {
+            return Inertia::render('tickets/TicketList');
+        })->name('index');
+
+        Route::get('/create', function () {
+            return Inertia::render('tickets/TicketCreate');
+        })->name('create');
+
+        Route::get('/{id}', function ($id) {
+            return Inertia::render('tickets/TicketView', ['id' => $id]);
+        })->name('show');
+
+        Route::get('/{id}/edit', function ($id) {
+            return Inertia::render('tickets/TicketEdit', ['id' => $id]);
+        })->name('edit');
+    });
+
+    // Reports
+    Route::get('reports', function () {
+        return Inertia::render('Reports');
+    })->name('reports');
+
+    // Notifications
+    Route::get('notifications', function () {
+        return Inertia::render('Notifications');
+    })->name('notifications');
+
+    // Profile
+    Route::get('profile', function () {
+        return Inertia::render('Profile');
+    })->name('profile');
+
+    // Admin routes
+    Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
+        Route::get('/users', function () {
+            return Inertia::render('admin/Users');
+        })->name('users');
+
+        Route::get('/categories', function () {
+            return Inertia::render('admin/Categories');
+        })->name('categories');
+
+        Route::get('/response-templates', function () {
+            return Inertia::render('admin/ResponseTemplates');
+        })->name('response-templates');
+    });
+});
+
+// Settings routes
 require __DIR__.'/settings.php';

@@ -1,0 +1,71 @@
+<?php
+
+namespace App\Events;
+
+use App\Models\Ticket;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class TicketStatusChanged
+{
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    /**
+     * The ticket instance.
+     */
+    public Ticket $ticket;
+
+    /**
+     * The previous status.
+     */
+    public string $oldStatus;
+
+    /**
+     * The new status.
+     */
+    public string $newStatus;
+
+    /**
+     * Create a new event instance.
+     */
+    public function __construct(Ticket $ticket, string $oldStatus, string $newStatus)
+    {
+        $this->ticket = $ticket;
+        $this->oldStatus = $oldStatus;
+        $this->newStatus = $newStatus;
+    }
+
+    /**
+     * Get the channels the event should broadcast on.
+     *
+     * @return array<int, \Illuminate\Broadcasting\Channel>
+     */
+    public function broadcastOn(): array
+    {
+        return [
+            new PrivateChannel('tickets'),
+            new PrivateChannel('user.' . $this->ticket->user_id),
+        ];
+    }
+
+    /**
+     * Get the data to broadcast.
+     *
+     * @return array<string, mixed>
+     */
+    public function broadcastWith(): array
+    {
+        return [
+            'ticket_id' => $this->ticket->id,
+            'ticket_number' => $this->ticket->ticket_number,
+            'old_status' => $this->oldStatus,
+            'new_status' => $this->newStatus,
+            'changed_at' => now()->toIso8601String(),
+        ];
+    }
+}
