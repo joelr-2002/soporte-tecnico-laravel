@@ -66,20 +66,7 @@ const priorityColors: Record<string, string> = {
   urgent: 'red',
 };
 
-const statusLabels: Record<string, string> = {
-  open: 'Open',
-  in_progress: 'In Progress',
-  pending: 'Pending',
-  resolved: 'Resolved',
-  closed: 'Closed',
-};
-
-const priorityLabels: Record<string, string> = {
-  low: 'Low',
-  medium: 'Medium',
-  high: 'High',
-  urgent: 'Urgent',
-};
+// Status and priority labels will be defined inside component to use translations
 
 const TicketList: React.FC = () => {
   const navigate = useNavigate();
@@ -88,6 +75,22 @@ const TicketList: React.FC = () => {
   const isAdmin = user?.role === 'admin';
   const isAgent = user?.role === 'agent';
   const canManage = isAdmin || isAgent;
+
+  // Translated labels
+  const statusLabels: Record<string, string> = {
+    open: t('status.open'),
+    in_progress: t('status.inProgress'),
+    pending: t('status.pending'),
+    resolved: t('status.resolved'),
+    closed: t('status.closed'),
+  };
+
+  const priorityLabels: Record<string, string> = {
+    low: t('priority.low'),
+    medium: t('priority.medium'),
+    high: t('priority.high'),
+    urgent: t('priority.urgent'),
+  };
 
   // Data states
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -219,7 +222,7 @@ const TicketList: React.FC = () => {
   const handleDelete = async (id: number) => {
     try {
       await api.delete(`/tickets/${id}`);
-      message.success('Ticket deleted successfully');
+      message.success(t('ticketList.ticketDeletedSuccessfully'));
       fetchTickets();
     } catch (error) {
       message.error(getErrorMessage(error));
@@ -230,7 +233,7 @@ const TicketList: React.FC = () => {
   const handleQuickStatusChange = async (ticketId: number, newStatus: string) => {
     try {
       await api.patch(`/tickets/${ticketId}/status`, { status: newStatus });
-      message.success('Status updated successfully');
+      message.success(t('ticketList.statusUpdatedSuccessfully'));
       fetchTickets();
     } catch (error) {
       message.error(getErrorMessage(error));
@@ -240,7 +243,7 @@ const TicketList: React.FC = () => {
   // Bulk assign
   const handleBulkAssign = async () => {
     if (!bulkAssignee) {
-      message.warning('Please select an agent');
+      message.warning(t('ticketList.pleaseSelectAgent'));
       return;
     }
     try {
@@ -248,7 +251,7 @@ const TicketList: React.FC = () => {
         ticket_ids: selectedRowKeys,
         assigned_to: bulkAssignee,
       });
-      message.success(`${selectedRowKeys.length} tickets assigned successfully`);
+      message.success(`${selectedRowKeys.length} ${t('ticketList.ticketsAssignedSuccessfully')}`);
       setBulkAssignModal(false);
       setBulkAssignee(undefined);
       setSelectedRowKeys([]);
@@ -261,7 +264,7 @@ const TicketList: React.FC = () => {
   // Bulk status change
   const handleBulkStatusChange = async () => {
     if (!bulkStatus) {
-      message.warning('Please select a status');
+      message.warning(t('ticketList.pleaseSelectStatus'));
       return;
     }
     try {
@@ -269,7 +272,7 @@ const TicketList: React.FC = () => {
         ticket_ids: selectedRowKeys,
         status: bulkStatus,
       });
-      message.success(`${selectedRowKeys.length} tickets updated successfully`);
+      message.success(`${selectedRowKeys.length} ${t('ticketList.ticketsUpdatedSuccessfully')}`);
       setBulkStatusModal(false);
       setBulkStatus(undefined);
       setSelectedRowKeys([]);
@@ -282,17 +285,17 @@ const TicketList: React.FC = () => {
   // Bulk delete
   const handleBulkDelete = async () => {
     Modal.confirm({
-      title: 'Delete Selected Tickets',
+      title: t('ticketList.deleteSelectedTickets'),
       icon: <ExclamationCircleOutlined />,
-      content: `Are you sure you want to delete ${selectedRowKeys.length} tickets? This action cannot be undone.`,
-      okText: 'Delete',
+      content: t('ticketList.confirmBulkDelete', { count: selectedRowKeys.length }),
+      okText: t('common.delete'),
       okType: 'danger',
       onOk: async () => {
         try {
           await api.post('/tickets/bulk-delete', {
             ticket_ids: selectedRowKeys,
           });
-          message.success(`${selectedRowKeys.length} tickets deleted successfully`);
+          message.success(`${selectedRowKeys.length} ${t('ticketList.ticketsDeletedSuccessfully')}`);
           setSelectedRowKeys([]);
           fetchTickets();
         } catch (error) {
@@ -340,7 +343,7 @@ const TicketList: React.FC = () => {
       {
         key: 'view',
         icon: <EyeOutlined />,
-        label: 'View Details',
+        label: t('ticketList.viewDetails'),
         onClick: () => navigate(`/tickets/${record.id}`),
       },
     ];
@@ -349,7 +352,7 @@ const TicketList: React.FC = () => {
       items.push({
         key: 'edit',
         icon: <EditOutlined />,
-        label: 'Edit',
+        label: t('common.edit'),
         onClick: () => navigate(`/tickets/${record.id}/edit`),
       });
     }
@@ -360,7 +363,7 @@ const TicketList: React.FC = () => {
       });
       items.push({
         key: 'status',
-        label: 'Change Status',
+        label: t('ticketList.changeStatus'),
         children: Object.entries(statusLabels).map(([value, label]) => ({
           key: `status-${value}`,
           label,
@@ -377,14 +380,14 @@ const TicketList: React.FC = () => {
       items.push({
         key: 'delete',
         icon: <DeleteOutlined />,
-        label: 'Delete',
+        label: t('common.delete'),
         danger: true,
         onClick: () => {
           Modal.confirm({
-            title: 'Delete Ticket',
+            title: t('ticketList.deleteTicket'),
             icon: <ExclamationCircleOutlined />,
-            content: `Are you sure you want to delete ticket #${record.ticket_number}?`,
-            okText: 'Delete',
+            content: t('ticketList.confirmDeleteTicket', { ticketNumber: record.ticket_number }),
+            okText: t('common.delete'),
             okType: 'danger',
             onOk: () => handleDelete(record.id),
           });
@@ -398,7 +401,7 @@ const TicketList: React.FC = () => {
   // Table columns
   const columns: ColumnsType<Ticket> = [
     {
-      title: 'Ticket #',
+      title: t('tickets.ticketNumber'),
       dataIndex: 'ticket_number',
       key: 'ticket_number',
       sorter: true,
@@ -406,7 +409,7 @@ const TicketList: React.FC = () => {
       render: (text) => <Text strong>{text}</Text>,
     },
     {
-      title: 'Title',
+      title: t('tickets.title'),
       dataIndex: 'title',
       key: 'title',
       sorter: true,
@@ -418,7 +421,7 @@ const TicketList: React.FC = () => {
       ),
     },
     {
-      title: 'Status',
+      title: t('tickets.status'),
       dataIndex: 'status',
       key: 'status',
       width: 120,
@@ -428,7 +431,7 @@ const TicketList: React.FC = () => {
       ),
     },
     {
-      title: 'Priority',
+      title: t('tickets.priority'),
       dataIndex: 'priority',
       key: 'priority',
       width: 100,
@@ -438,21 +441,21 @@ const TicketList: React.FC = () => {
       ),
     },
     {
-      title: 'Category',
+      title: t('tickets.category'),
       dataIndex: 'category',
       key: 'category',
       width: 130,
       render: (category: Category) => category?.name || '-',
     },
     {
-      title: 'Created By',
+      title: t('tickets.createdBy'),
       dataIndex: 'user',
       key: 'user',
       width: 130,
       render: (ticketUser: User) => ticketUser?.name || '-',
     },
     {
-      title: 'Assigned To',
+      title: t('tickets.assignedTo'),
       dataIndex: 'assignee',
       key: 'assignee',
       width: 130,
@@ -460,12 +463,12 @@ const TicketList: React.FC = () => {
         assignee ? (
           <Badge status="processing" text={assignee.name} />
         ) : (
-          <Text type="secondary">Unassigned</Text>
+          <Text type="secondary">{t('tickets.unassigned')}</Text>
         )
       ),
     },
     {
-      title: 'Created At',
+      title: t('tickets.createdAt'),
       dataIndex: 'created_at',
       key: 'created_at',
       width: 150,
@@ -473,7 +476,7 @@ const TicketList: React.FC = () => {
       render: (date: string) => dayjs(date).format('MMM DD, YYYY HH:mm'),
     },
     {
-      title: 'Actions',
+      title: t('common.actions'),
       key: 'actions',
       width: 80,
       fixed: 'right',
@@ -498,7 +501,7 @@ const TicketList: React.FC = () => {
       <div style={{ marginBottom: 24 }}>
         <Row justify="space-between" align="middle">
           <Col>
-            <Title level={4} style={{ margin: 0 }}>Tickets</Title>
+            <Title level={4} style={{ margin: 0 }}>{t('ticketList.title')}</Title>
           </Col>
           <Col>
             <Space>
@@ -506,20 +509,20 @@ const TicketList: React.FC = () => {
                 icon={<ReloadOutlined />}
                 onClick={() => fetchTickets()}
               >
-                Refresh
+                {t('common.refresh')}
               </Button>
               <Button
                 icon={<DownloadOutlined />}
                 onClick={handleExport}
               >
-                Export CSV
+                {t('ticketList.exportCsv')}
               </Button>
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
                 onClick={() => navigate('/tickets/create')}
               >
-                New Ticket
+                {t('ticketList.newTicket')}
               </Button>
             </Space>
           </Col>
@@ -531,7 +534,7 @@ const TicketList: React.FC = () => {
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={12} md={8} lg={6}>
             <Input
-              placeholder={t('placeholders.searchTickets')}
+              placeholder={t('ticketList.searchPlaceholder')}
               prefix={<SearchOutlined />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
@@ -542,7 +545,7 @@ const TicketList: React.FC = () => {
           <Col xs={24} sm={12} md={8} lg={4}>
             <Select
               mode="multiple"
-              placeholder={t('placeholders.filterByStatus')}
+              placeholder={t('ticketList.filterByStatus')}
               style={{ width: '100%' }}
               value={statusFilter}
               onChange={setStatusFilter}
@@ -559,7 +562,7 @@ const TicketList: React.FC = () => {
           <Col xs={24} sm={12} md={8} lg={4}>
             <Select
               mode="multiple"
-              placeholder={t('placeholders.filterByPriority')}
+              placeholder={t('ticketList.filterByPriority')}
               style={{ width: '100%' }}
               value={priorityFilter}
               onChange={setPriorityFilter}
@@ -575,7 +578,7 @@ const TicketList: React.FC = () => {
           </Col>
           <Col xs={24} sm={12} md={8} lg={4}>
             <Select
-              placeholder={t('placeholders.filterByCategory')}
+              placeholder={t('ticketList.filterByCategory')}
               style={{ width: '100%' }}
               value={categoryFilter}
               onChange={setCategoryFilter}
@@ -624,13 +627,13 @@ const TicketList: React.FC = () => {
                 onClick={() => fetchTickets()}
                 type="primary"
               >
-                Filter
+                {t('common.filter')}
               </Button>
               <Button
                 icon={<ClearOutlined />}
                 onClick={clearFilters}
               >
-                Clear
+                {t('common.clear')}
               </Button>
             </Space>
           </Col>
@@ -641,18 +644,18 @@ const TicketList: React.FC = () => {
       {isAdmin && selectedRowKeys.length > 0 && (
         <Card style={{ marginBottom: 16 }}>
           <Space>
-            <Text strong>{selectedRowKeys.length} tickets selected</Text>
+            <Text strong>{t('ticketList.ticketsSelected', { count: selectedRowKeys.length })}</Text>
             <Button onClick={() => setBulkAssignModal(true)}>
-              Assign
+              {t('ticketList.bulkAssign')}
             </Button>
             <Button onClick={() => setBulkStatusModal(true)}>
-              Change Status
+              {t('ticketList.bulkChangeStatus')}
             </Button>
             <Button danger onClick={handleBulkDelete}>
-              Delete
+              {t('common.delete')}
             </Button>
             <Button onClick={() => setSelectedRowKeys([])}>
-              Clear Selection
+              {t('ticketList.clearSelection')}
             </Button>
           </Space>
         </Card>
@@ -678,7 +681,7 @@ const TicketList: React.FC = () => {
 
       {/* Bulk Assign Modal */}
       <Modal
-        title={t('tickets.assignTo')}
+        title={t('ticketList.bulkAssign')}
         open={bulkAssignModal}
         onOk={handleBulkAssign}
         onCancel={() => {
@@ -686,9 +689,9 @@ const TicketList: React.FC = () => {
           setBulkAssignee(undefined);
         }}
       >
-        <p>{t('tickets.assignTo')} {selectedRowKeys.length} tickets:</p>
+        <p>{t('ticketList.confirmBulkAssign', { count: selectedRowKeys.length })}</p>
         <Select
-          placeholder={t('placeholders.selectAgent')}
+          placeholder={t('ticketList.selectAgent')}
           style={{ width: '100%' }}
           value={bulkAssignee}
           onChange={setBulkAssignee}
@@ -705,7 +708,7 @@ const TicketList: React.FC = () => {
 
       {/* Bulk Status Change Modal */}
       <Modal
-        title={t('tickets.status')}
+        title={t('ticketList.bulkChangeStatus')}
         open={bulkStatusModal}
         onOk={handleBulkStatusChange}
         onCancel={() => {
@@ -713,9 +716,9 @@ const TicketList: React.FC = () => {
           setBulkStatus(undefined);
         }}
       >
-        <p>{t('tickets.status')} ({selectedRowKeys.length} tickets):</p>
+        <p>{t('ticketList.confirmBulkStatus', { count: selectedRowKeys.length })}</p>
         <Select
-          placeholder={t('placeholders.selectStatus')}
+          placeholder={t('ticketList.selectStatus')}
           style={{ width: '100%' }}
           value={bulkStatus}
           onChange={setBulkStatus}

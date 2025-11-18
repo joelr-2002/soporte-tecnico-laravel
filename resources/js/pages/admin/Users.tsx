@@ -29,6 +29,7 @@ import {
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import dayjs from 'dayjs';
 import userService, { UserWithStats, UserCreateData, UserUpdateData } from '../../services/userService';
+import { useTranslation } from '@/i18n';
 
 const { Title, Text } = Typography;
 
@@ -38,13 +39,15 @@ const roleColors: Record<string, string> = {
   user: 'default',
 };
 
-const roleLabels: Record<string, string> = {
-  admin: 'Admin',
-  agent: 'Agent',
-  user: 'User',
-};
-
 const Users: React.FC = () => {
+  const { t } = useTranslation();
+
+  const roleLabels: Record<string, string> = {
+    admin: t('users.admin'),
+    agent: t('users.agents'),
+    user: t('users.user'),
+  };
+
   // Data states
   const [users, setUsers] = useState<UserWithStats[]>([]);
   const [loading, setLoading] = useState(false);
@@ -66,7 +69,7 @@ const Users: React.FC = () => {
     current: 1,
     pageSize: 10,
     showSizeChanger: true,
-    showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} users`,
+    showTotal: (total, range) => `${range[0]}-${range[1]} ${t('common.of')} ${total} ${t('users.title')}`,
   });
 
   // Fetch users
@@ -85,11 +88,11 @@ const Users: React.FC = () => {
         total: response.total,
       });
     } catch (error) {
-      message.error(error instanceof Error ? error.message : 'Failed to fetch users');
+      message.error(error instanceof Error ? error.message : t('users.failedToFetch'));
     } finally {
       setLoading(false);
     }
-  }, [pagination.current, pagination.pageSize, searchText, roleFilter]);
+  }, [pagination.current, pagination.pageSize, searchText, roleFilter, t]);
 
   useEffect(() => {
     fetchUsers();
@@ -109,12 +112,12 @@ const Users: React.FC = () => {
     setSubmitting(true);
     try {
       await userService.createUser(values);
-      message.success('User created successfully');
+      message.success(t('users.createdSuccessfully'));
       setCreateModalVisible(false);
       createForm.resetFields();
       fetchUsers();
     } catch (error) {
-      message.error(error instanceof Error ? error.message : 'Failed to create user');
+      message.error(error instanceof Error ? error.message : t('users.failedToCreate'));
     } finally {
       setSubmitting(false);
     }
@@ -133,13 +136,13 @@ const Users: React.FC = () => {
     setSubmitting(true);
     try {
       await userService.updateUser(editingUser.id, values);
-      message.success('User updated successfully');
+      message.success(t('users.updatedSuccessfully'));
       setEditModalVisible(false);
       setEditingUser(null);
       editForm.resetFields();
       fetchUsers();
     } catch (error) {
-      message.error(error instanceof Error ? error.message : 'Failed to update user');
+      message.error(error instanceof Error ? error.message : t('users.failedToUpdate'));
     } finally {
       setSubmitting(false);
     }
@@ -149,10 +152,10 @@ const Users: React.FC = () => {
   const handleDelete = async (id: number) => {
     try {
       await userService.deleteUser(id);
-      message.success('User deleted successfully');
+      message.success(t('users.deletedSuccessfully'));
       fetchUsers();
     } catch (error) {
-      message.error(error instanceof Error ? error.message : 'Failed to delete user');
+      message.error(error instanceof Error ? error.message : t('users.failedToDelete'));
     }
   };
 
@@ -160,10 +163,10 @@ const Users: React.FC = () => {
   const handleChangeRole = async (id: number, role: 'admin' | 'agent' | 'user') => {
     try {
       await userService.changeRole(id, role);
-      message.success('Role updated successfully');
+      message.success(t('users.roleUpdatedSuccessfully'));
       fetchUsers();
     } catch (error) {
-      message.error(error instanceof Error ? error.message : 'Failed to update role');
+      message.error(error instanceof Error ? error.message : t('users.failedToUpdateRole'));
     }
   };
 
@@ -188,7 +191,7 @@ const Users: React.FC = () => {
   // Table columns
   const columns: ColumnsType<UserWithStats> = [
     {
-      title: 'Avatar',
+      title: t('users.avatar'),
       key: 'avatar',
       width: 60,
       render: (_, record) => (
@@ -200,20 +203,20 @@ const Users: React.FC = () => {
       ),
     },
     {
-      title: 'Name',
+      title: t('users.name'),
       dataIndex: 'name',
       key: 'name',
       sorter: (a, b) => a.name.localeCompare(b.name),
       render: (text) => <Text strong>{text}</Text>,
     },
     {
-      title: 'Email',
+      title: t('users.email'),
       dataIndex: 'email',
       key: 'email',
       ellipsis: true,
     },
     {
-      title: 'Role',
+      title: t('users.role'),
       dataIndex: 'role',
       key: 'role',
       width: 120,
@@ -234,14 +237,14 @@ const Users: React.FC = () => {
       ),
     },
     {
-      title: 'Phone',
+      title: t('users.phone'),
       dataIndex: 'phone',
       key: 'phone',
       width: 130,
       render: (phone) => phone || <Text type="secondary">-</Text>,
     },
     {
-      title: 'Tickets',
+      title: t('users.tickets'),
       key: 'tickets_count',
       width: 100,
       align: 'center',
@@ -253,7 +256,7 @@ const Users: React.FC = () => {
       ),
     },
     {
-      title: 'Created At',
+      title: t('users.createdAt'),
       dataIndex: 'created_at',
       key: 'created_at',
       width: 130,
@@ -261,27 +264,27 @@ const Users: React.FC = () => {
       render: (date: string) => dayjs(date).format('MMM DD, YYYY'),
     },
     {
-      title: 'Actions',
+      title: t('common.actions'),
       key: 'actions',
       width: 120,
       align: 'center',
       render: (_, record) => (
         <Space>
-          <Tooltip title="Edit">
+          <Tooltip title={t('common.edit')}>
             <Button
               type="text"
               icon={<EditOutlined />}
               onClick={() => openEditModal(record)}
             />
           </Tooltip>
-          <Tooltip title={getTicketCount(record) > 0 ? 'Cannot delete: has tickets' : 'Delete'}>
+          <Tooltip title={getTicketCount(record) > 0 ? t('users.cannotDeleteHasTickets') : t('common.delete')}>
             <Popconfirm
-              title="Delete User"
-              description="Are you sure you want to delete this user?"
+              title={t('users.deleteUser')}
+              description={t('messages.confirmDelete')}
               onConfirm={() => handleDelete(record.id)}
-              okText="Delete"
+              okText={t('common.delete')}
               okType="danger"
-              cancelText="Cancel"
+              cancelText={t('common.cancel')}
               disabled={getTicketCount(record) > 0}
             >
               <Button
@@ -302,7 +305,7 @@ const Users: React.FC = () => {
       <div style={{ marginBottom: 24 }}>
         <Row justify="space-between" align="middle">
           <Col>
-            <Title level={4} style={{ margin: 0 }}>User Management</Title>
+            <Title level={4} style={{ margin: 0 }}>{t('users.management')}</Title>
           </Col>
           <Col>
             <Space>
@@ -310,7 +313,7 @@ const Users: React.FC = () => {
                 icon={<ReloadOutlined />}
                 onClick={() => fetchUsers()}
               >
-                Refresh
+                {t('common.refresh')}
               </Button>
               <Button
                 type="primary"
@@ -321,7 +324,7 @@ const Users: React.FC = () => {
                   setCreateModalVisible(true);
                 }}
               >
-                New User
+                {t('users.newUser')}
               </Button>
             </Space>
           </Col>
@@ -333,7 +336,7 @@ const Users: React.FC = () => {
         <Row gutter={16}>
           <Col xs={24} sm={12} md={8}>
             <Input
-              placeholder="Search users..."
+              placeholder={t('users.search')}
               prefix={<SearchOutlined />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
@@ -346,7 +349,7 @@ const Users: React.FC = () => {
           </Col>
           <Col xs={24} sm={12} md={6}>
             <Select
-              placeholder="Filter by role"
+              placeholder={t('users.filterByRole')}
               style={{ width: '100%' }}
               value={roleFilter}
               onChange={(value) => {
@@ -380,7 +383,7 @@ const Users: React.FC = () => {
 
       {/* Create Modal */}
       <Modal
-        title="Create User"
+        title={t('users.create')}
         open={createModalVisible}
         onCancel={() => {
           setCreateModalVisible(false);
@@ -398,32 +401,32 @@ const Users: React.FC = () => {
         >
           <Form.Item
             name="name"
-            label="Name"
+            label={t('users.name')}
             rules={[
-              { required: true, message: 'Please enter name' },
-              { max: 255, message: 'Name cannot exceed 255 characters' },
+              { required: true, message: t('validation.required', { field: t('users.name') }) },
+              { max: 255, message: t('validation.maxLength', { field: t('users.name'), max: '255' }) },
             ]}
           >
-            <Input placeholder="Enter name" />
+            <Input placeholder={t('users.enterName')} />
           </Form.Item>
 
           <Form.Item
             name="email"
-            label="Email"
+            label={t('users.email')}
             rules={[
-              { required: true, message: 'Please enter email' },
-              { type: 'email', message: 'Please enter a valid email' },
+              { required: true, message: t('validation.required', { field: t('users.email') }) },
+              { type: 'email', message: t('validation.email') },
             ]}
           >
-            <Input placeholder="Enter email" />
+            <Input placeholder={t('users.enterEmail')} />
           </Form.Item>
 
           <Form.Item
             name="role"
-            label="Role"
-            rules={[{ required: true, message: 'Please select role' }]}
+            label={t('users.role')}
+            rules={[{ required: true, message: t('validation.required', { field: t('users.role') }) }]}
           >
-            <Select placeholder="Select role">
+            <Select placeholder={t('users.selectRole')}>
               {Object.entries(roleLabels).map(([value, label]) => (
                 <Select.Option key={value} value={value}>
                   <Tag color={roleColors[value]}>{label}</Tag>
@@ -434,39 +437,39 @@ const Users: React.FC = () => {
 
           <Form.Item
             name="password"
-            label="Password"
+            label={t('users.password')}
             rules={[
-              { required: true, message: 'Please enter password' },
-              { min: 8, message: 'Password must be at least 8 characters' },
+              { required: true, message: t('validation.required', { field: t('users.password') }) },
+              { min: 8, message: t('validation.minLength', { field: t('users.password'), min: '8' }) },
             ]}
           >
-            <Input.Password placeholder="Enter password" />
+            <Input.Password placeholder={t('users.enterPassword')} />
           </Form.Item>
 
           <Form.Item
             name="password_confirmation"
-            label="Confirm Password"
+            label={t('users.confirmPassword')}
             dependencies={['password']}
             rules={[
-              { required: true, message: 'Please confirm password' },
+              { required: true, message: t('validation.required', { field: t('users.confirmPassword') }) },
               ({ getFieldValue }) => ({
                 validator(_, value) {
                   if (!value || getFieldValue('password') === value) {
                     return Promise.resolve();
                   }
-                  return Promise.reject(new Error('Passwords do not match'));
+                  return Promise.reject(new Error(t('validation.passwordMismatch')));
                 },
               }),
             ]}
           >
-            <Input.Password placeholder="Confirm password" />
+            <Input.Password placeholder={t('users.confirmPasswordPlaceholder')} />
           </Form.Item>
 
           <Form.Item
             name="phone"
-            label="Phone"
+            label={t('users.phone')}
           >
-            <Input placeholder="Enter phone number" />
+            <Input placeholder={t('users.enterPhone')} />
           </Form.Item>
 
           <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
@@ -475,10 +478,10 @@ const Users: React.FC = () => {
                 setCreateModalVisible(false);
                 createForm.resetFields();
               }}>
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button type="primary" htmlType="submit" loading={submitting}>
-                Create
+                {t('common.create')}
               </Button>
             </Space>
           </Form.Item>
@@ -487,7 +490,7 @@ const Users: React.FC = () => {
 
       {/* Edit Modal */}
       <Modal
-        title="Edit User"
+        title={t('users.edit')}
         open={editModalVisible}
         onCancel={() => {
           setEditModalVisible(false);
@@ -505,32 +508,32 @@ const Users: React.FC = () => {
         >
           <Form.Item
             name="name"
-            label="Name"
+            label={t('users.name')}
             rules={[
-              { required: true, message: 'Please enter name' },
-              { max: 255, message: 'Name cannot exceed 255 characters' },
+              { required: true, message: t('validation.required', { field: t('users.name') }) },
+              { max: 255, message: t('validation.maxLength', { field: t('users.name'), max: '255' }) },
             ]}
           >
-            <Input placeholder="Enter name" />
+            <Input placeholder={t('users.enterName')} />
           </Form.Item>
 
           <Form.Item
             name="email"
-            label="Email"
+            label={t('users.email')}
             rules={[
-              { required: true, message: 'Please enter email' },
-              { type: 'email', message: 'Please enter a valid email' },
+              { required: true, message: t('validation.required', { field: t('users.email') }) },
+              { type: 'email', message: t('validation.email') },
             ]}
           >
-            <Input placeholder="Enter email" />
+            <Input placeholder={t('users.enterEmail')} />
           </Form.Item>
 
           <Form.Item
             name="role"
-            label="Role"
-            rules={[{ required: true, message: 'Please select role' }]}
+            label={t('users.role')}
+            rules={[{ required: true, message: t('validation.required', { field: t('users.role') }) }]}
           >
-            <Select placeholder="Select role">
+            <Select placeholder={t('users.selectRole')}>
               {Object.entries(roleLabels).map(([value, label]) => (
                 <Select.Option key={value} value={value}>
                   <Tag color={roleColors[value]}>{label}</Tag>
@@ -541,17 +544,17 @@ const Users: React.FC = () => {
 
           <Form.Item
             name="password"
-            label="New Password"
+            label={t('users.newPassword')}
             rules={[
-              { min: 8, message: 'Password must be at least 8 characters' },
+              { min: 8, message: t('validation.minLength', { field: t('users.password'), min: '8' }) },
             ]}
           >
-            <Input.Password placeholder="Leave blank to keep current" />
+            <Input.Password placeholder={t('users.leaveBlankToKeep')} />
           </Form.Item>
 
           <Form.Item
             name="password_confirmation"
-            label="Confirm New Password"
+            label={t('users.confirmNewPassword')}
             dependencies={['password']}
             rules={[
               ({ getFieldValue }) => ({
@@ -559,27 +562,27 @@ const Users: React.FC = () => {
                   if (!getFieldValue('password') || getFieldValue('password') === value) {
                     return Promise.resolve();
                   }
-                  return Promise.reject(new Error('Passwords do not match'));
+                  return Promise.reject(new Error(t('validation.passwordMismatch')));
                 },
               }),
             ]}
           >
-            <Input.Password placeholder="Confirm new password" />
+            <Input.Password placeholder={t('users.confirmNewPasswordPlaceholder')} />
           </Form.Item>
 
           <Form.Item
             name="phone"
-            label="Phone"
+            label={t('users.phone')}
           >
-            <Input placeholder="Enter phone number" />
+            <Input placeholder={t('users.enterPhone')} />
           </Form.Item>
 
           <Form.Item
             name="is_active"
-            label="Active"
+            label={t('users.active')}
             valuePropName="checked"
           >
-            <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
+            <Switch checkedChildren={t('users.active')} unCheckedChildren={t('users.inactive')} />
           </Form.Item>
 
           <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
@@ -589,10 +592,10 @@ const Users: React.FC = () => {
                 setEditingUser(null);
                 editForm.resetFields();
               }}>
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button type="primary" htmlType="submit" loading={submitting}>
-                Update
+                {t('common.update')}
               </Button>
             </Space>
           </Form.Item>

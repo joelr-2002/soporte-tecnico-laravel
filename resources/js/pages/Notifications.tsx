@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from '@/i18n';
 import {
   Card,
   List,
@@ -81,6 +82,7 @@ const notificationConfig: Record<string, { icon: React.ReactNode; color: string 
 
 const Notifications: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // Data states
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -128,9 +130,9 @@ const Notifications: React.FC = () => {
           n.id === id ? { ...n, read_at: new Date().toISOString() } : n
         )
       );
-      message.success('Notification marked as read');
+      message.success(t('notifications.markedAsRead'));
     } catch (error) {
-      message.error(error instanceof Error ? error.message : 'Failed to mark notification as read');
+      message.error(error instanceof Error ? error.message : t('notifications.failedToMark'));
     }
   };
 
@@ -144,9 +146,9 @@ const Notifications: React.FC = () => {
           read_at: n.read_at || new Date().toISOString(),
         }))
       );
-      message.success('All notifications marked as read');
+      message.success(t('notifications.allMarkedAsRead'));
     } catch (error) {
-      message.error(error instanceof Error ? error.message : 'Failed to mark all as read');
+      message.error(error instanceof Error ? error.message : t('notifications.failedToMarkAll'));
     }
   };
 
@@ -155,9 +157,9 @@ const Notifications: React.FC = () => {
     try {
       await notificationService.deleteNotification(id);
       setNotifications(notifications.filter((n) => n.id !== id));
-      message.success('Notification deleted');
+      message.success(t('notifications.deleted'));
     } catch (error) {
-      message.error(error instanceof Error ? error.message : 'Failed to delete notification');
+      message.error(error instanceof Error ? error.message : t('notifications.failedToDelete'));
     }
   };
 
@@ -199,7 +201,7 @@ const Notifications: React.FC = () => {
         <Row justify="space-between" align="middle">
           <Col>
             <Space>
-              <Title level={4} style={{ margin: 0 }}>Notifications</Title>
+              <Title level={4} style={{ margin: 0 }}>{t('notifications.title')}</Title>
               {unreadCount > 0 && (
                 <Badge count={unreadCount} style={{ marginLeft: 8 }} />
               )}
@@ -211,14 +213,14 @@ const Notifications: React.FC = () => {
                 icon={<ReloadOutlined />}
                 onClick={() => fetchNotifications()}
               >
-                Refresh
+                {t('common.refresh')}
               </Button>
               <Button
                 icon={<CheckOutlined />}
                 onClick={handleMarkAllAsRead}
                 disabled={unreadCount === 0}
               >
-                Mark All as Read
+                {t('notifications.markAllRead')}
               </Button>
             </Space>
           </Col>
@@ -229,11 +231,11 @@ const Notifications: React.FC = () => {
       <Card style={{ marginBottom: 16 }}>
         <Segmented
           options={[
-            { label: 'All Notifications', value: 'all' },
+            { label: t('notifications.allNotifications'), value: 'all' },
             {
               label: (
                 <Space>
-                  Unread
+                  {t('notifications.unread')}
                   {unreadCount > 0 && <Badge count={unreadCount} size="small" />}
                 </Space>
               ),
@@ -255,7 +257,7 @@ const Notifications: React.FC = () => {
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
               description={
-                filter === 'unread' ? 'No unread notifications' : 'No notifications'
+                filter === 'unread' ? t('notifications.noUnreadNotifications') : t('notifications.noNotifications')
               }
             />
           ) : (
@@ -293,7 +295,7 @@ const Notifications: React.FC = () => {
                             handleMarkAsRead(notification.id);
                           }}
                         >
-                          Mark Read
+                          {t('notifications.markAsRead')}
                         </Button>
                       ),
                       <Button
@@ -320,7 +322,7 @@ const Notifications: React.FC = () => {
                           <Text strong={isUnread}>{notification.data.title}</Text>
                           {isUnread && (
                             <Tag color="blue" style={{ margin: 0 }}>
-                              New
+                              {t('notifications.new')}
                             </Tag>
                           )}
                         </Space>
@@ -341,7 +343,7 @@ const Notifications: React.FC = () => {
                               color="default"
                               style={{ marginLeft: 8, fontSize: 11 }}
                             >
-                              Ticket #{notification.data.ticket_id}
+                              {t('notifications.ticketPrefix')} #{notification.data.ticket_id}
                             </Tag>
                           )}
                         </div>

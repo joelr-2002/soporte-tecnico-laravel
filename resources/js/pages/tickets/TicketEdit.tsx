@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from '@/i18n';
 import {
   Form,
   Input,
@@ -38,21 +39,6 @@ const { Title, Text } = Typography;
 const { TextArea } = Input;
 const { Dragger } = Upload;
 
-const statusOptions = [
-  { value: 'open', label: 'Open', color: 'blue' },
-  { value: 'in_progress', label: 'In Progress', color: 'processing' },
-  { value: 'pending', label: 'Pending', color: 'warning' },
-  { value: 'resolved', label: 'Resolved', color: 'success' },
-  { value: 'closed', label: 'Closed', color: 'default' },
-];
-
-const priorityOptions = [
-  { value: 'low', label: 'Low', color: 'default' },
-  { value: 'medium', label: 'Medium', color: 'blue' },
-  { value: 'high', label: 'High', color: 'orange' },
-  { value: 'urgent', label: 'Urgent', color: 'red' },
-];
-
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_FILE_TYPES = [
   'image/jpeg',
@@ -77,6 +63,7 @@ interface EditFormData {
 }
 
 const TicketEdit: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [form] = Form.useForm();
@@ -84,6 +71,21 @@ const TicketEdit: React.FC = () => {
   const isAdmin = user?.role === 'admin';
   const isAgent = user?.role === 'agent';
   const canManage = isAdmin || isAgent;
+
+  const statusOptions = [
+    { value: 'open', label: t('status.open'), color: 'blue' },
+    { value: 'in_progress', label: t('status.inProgress'), color: 'processing' },
+    { value: 'pending', label: t('status.pending'), color: 'warning' },
+    { value: 'resolved', label: t('status.resolved'), color: 'success' },
+    { value: 'closed', label: t('status.closed'), color: 'default' },
+  ];
+
+  const priorityOptions = [
+    { value: 'low', label: t('priority.low'), color: 'default' },
+    { value: 'medium', label: t('priority.medium'), color: 'blue' },
+    { value: 'high', label: t('priority.high'), color: 'orange' },
+    { value: 'urgent', label: t('priority.urgent'), color: 'red' },
+  ];
 
   // State
   const [ticket, setTicket] = useState<Ticket | null>(null);
@@ -104,14 +106,14 @@ const TicketEdit: React.FC = () => {
 
       // Check if user can edit this ticket
       if (!canManage && ticketData.user_id !== user?.id) {
-        message.error('You do not have permission to edit this ticket');
+        message.error(t('ticketForm.noPermissionToEdit'));
         navigate('/tickets/list');
         return;
       }
 
       // Users can only edit open tickets
       if (!canManage && ticketData.status !== 'open') {
-        message.error('You can only edit open tickets');
+        message.error(t('ticketForm.canOnlyEditOpen'));
         navigate(`/tickets/${id}`);
         return;
       }
@@ -200,7 +202,7 @@ const TicketEdit: React.FC = () => {
         },
       });
 
-      message.success('Ticket updated successfully');
+      message.success(t('ticketForm.ticketUpdatedSuccessfully'));
       navigate(`/tickets/${id}`);
     } catch (error) {
       const validationErrors = getValidationErrors(error);
@@ -224,12 +226,12 @@ const TicketEdit: React.FC = () => {
     fileList,
     beforeUpload: (file) => {
       if (file.size > MAX_FILE_SIZE) {
-        message.error(`${file.name} is too large. Maximum size is 10MB.`);
+        message.error(t('ticketForm.fileTooLarge', { filename: file.name }));
         return Upload.LIST_IGNORE;
       }
 
       if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-        message.error(`${file.name} is not a supported file type.`);
+        message.error(t('ticketForm.fileTypeNotSupported', { filename: file.name }));
         return Upload.LIST_IGNORE;
       }
 
@@ -297,7 +299,7 @@ const TicketEdit: React.FC = () => {
   }
 
   if (!ticket) {
-    return <Empty description="Ticket not found" />;
+    return <Empty description={t('ticketForm.ticketNotFound')} />;
   }
 
   return (
@@ -308,13 +310,13 @@ const TicketEdit: React.FC = () => {
           onClick={() => navigate(`/tickets/${id}`)}
           style={{ marginBottom: 16 }}
         >
-          Back to Ticket
+          {t('ticketForm.backToTicket')}
         </Button>
         <Title level={4} style={{ margin: 0 }}>
-          Edit Ticket #{ticket.ticket_number}
+          {t('ticketForm.editTicket')} #{ticket.ticket_number}
         </Title>
         <Text type="secondary">
-          Update the ticket details below
+          {t('ticketForm.updateDetails')}
         </Text>
       </div>
 
@@ -328,15 +330,15 @@ const TicketEdit: React.FC = () => {
             >
               <Form.Item
                 name="title"
-                label="Title"
+                label={t('tickets.title')}
                 rules={[
-                  { required: true, message: 'Please enter a title' },
-                  { min: 5, message: 'Title must be at least 5 characters' },
-                  { max: 255, message: 'Title cannot exceed 255 characters' },
+                  { required: true, message: t('ticketForm.pleaseEnterTitle') },
+                  { min: 5, message: t('ticketForm.titleMinLength') },
+                  { max: 255, message: t('ticketForm.titleMaxLength') },
                 ]}
               >
                 <Input
-                  placeholder="Brief summary of your issue"
+                  placeholder={t('ticketForm.titlePlaceholder')}
                   maxLength={255}
                   showCount
                   disabled={!canManage && ticket.status !== 'open'}
@@ -345,14 +347,14 @@ const TicketEdit: React.FC = () => {
 
               <Form.Item
                 name="description"
-                label="Description"
+                label={t('tickets.description')}
                 rules={[
-                  { required: true, message: 'Please enter a description' },
-                  { min: 20, message: 'Description must be at least 20 characters' },
+                  { required: true, message: t('ticketForm.pleaseEnterDescription') },
+                  { min: 20, message: t('ticketForm.descriptionMinLength') },
                 ]}
               >
                 <TextArea
-                  placeholder="Provide detailed information about your issue"
+                  placeholder={t('ticketForm.descriptionPlaceholder')}
                   rows={8}
                   showCount
                   maxLength={5000}
@@ -364,11 +366,11 @@ const TicketEdit: React.FC = () => {
                 <Col xs={24} sm={12}>
                   <Form.Item
                     name="category_id"
-                    label="Category"
-                    rules={[{ required: true, message: 'Please select a category' }]}
+                    label={t('tickets.category')}
+                    rules={[{ required: true, message: t('ticketForm.pleaseSelectCategory') }]}
                   >
                     <Select
-                      placeholder="Select category"
+                      placeholder={t('ticketForm.selectCategory')}
                       showSearch
                       optionFilterProp="children"
                       disabled={!canManage && ticket.status !== 'open'}
@@ -384,11 +386,11 @@ const TicketEdit: React.FC = () => {
                 <Col xs={24} sm={12}>
                   <Form.Item
                     name="priority"
-                    label="Priority"
-                    rules={[{ required: true, message: 'Please select a priority' }]}
+                    label={t('tickets.priority')}
+                    rules={[{ required: true, message: t('ticketForm.pleaseSelectPriority') }]}
                   >
                     <Select
-                      placeholder="Select priority"
+                      placeholder={t('ticketForm.selectPriority')}
                       disabled={!canManage && ticket.status !== 'open'}
                     >
                       {priorityOptions.map((option) => (
@@ -407,9 +409,9 @@ const TicketEdit: React.FC = () => {
                   <Col xs={24} sm={12}>
                     <Form.Item
                       name="status"
-                      label="Status"
+                      label={t('tickets.status')}
                     >
-                      <Select placeholder="Select status">
+                      <Select placeholder={t('ticketForm.selectStatus')}>
                         {statusOptions.map((option) => (
                           <Select.Option key={option.value} value={option.value}>
                             <Tag color={option.color}>{option.label}</Tag>
@@ -421,10 +423,10 @@ const TicketEdit: React.FC = () => {
                   <Col xs={24} sm={12}>
                     <Form.Item
                       name="assigned_to"
-                      label="Assigned To"
+                      label={t('tickets.assignedTo')}
                     >
                       <Select
-                        placeholder="Select agent"
+                        placeholder={t('ticketForm.selectAgent')}
                         showSearch
                         optionFilterProp="children"
                         allowClear
@@ -440,12 +442,12 @@ const TicketEdit: React.FC = () => {
                 </Row>
               )}
 
-              <Divider>Attachments</Divider>
+              <Divider>{t('ticketForm.attachments')}</Divider>
 
               {/* Existing Attachments */}
               {existingAttachments.length > 0 && (
                 <>
-                  <Text strong>Current Attachments</Text>
+                  <Text strong>{t('ticketForm.currentAttachments')}</Text>
                   <List
                     size="small"
                     bordered
@@ -460,11 +462,11 @@ const TicketEdit: React.FC = () => {
                             icon={<DownloadOutlined />}
                             onClick={() => handleDownload(attachment)}
                           >
-                            Download
+                            {t('ticketForm.downloadAttachment')}
                           </Button>,
                           <Popconfirm
                             key="delete"
-                            title="Delete attachment?"
+                            title={t('ticketForm.deleteAttachment')}
                             onConfirm={() => handleDeleteAttachment(attachment.id)}
                           >
                             <Button type="text" danger icon={<DeleteOutlined />} />
@@ -483,18 +485,17 @@ const TicketEdit: React.FC = () => {
               )}
 
               {/* New Attachments Upload */}
-              <Text strong>Add New Attachments</Text>
+              <Text strong>{t('ticketForm.addNewAttachments')}</Text>
               <Form.Item style={{ marginTop: 8 }}>
                 <Dragger {...uploadProps}>
                   <p className="ant-upload-drag-icon">
                     <InboxOutlined />
                   </p>
                   <p className="ant-upload-text">
-                    Click or drag files to this area to upload
+                    {t('ticketForm.clickOrDrag')}
                   </p>
                   <p className="ant-upload-hint">
-                    Support for images, PDFs, documents, and archives.
-                    Maximum file size: 10MB per file.
+                    {t('ticketForm.supportedFormats')}
                   </p>
                 </Dragger>
               </Form.Item>
@@ -544,10 +545,10 @@ const TicketEdit: React.FC = () => {
                     loading={saving}
                     icon={<SaveOutlined />}
                   >
-                    Save Changes
+                    {t('ticketForm.saveChanges')}
                   </Button>
                   <Button onClick={() => navigate(`/tickets/${id}`)}>
-                    Cancel
+                    {t('common.cancel')}
                   </Button>
                 </Space>
               </Form.Item>
@@ -557,22 +558,22 @@ const TicketEdit: React.FC = () => {
 
         <Col xs={24} lg={8}>
           {/* Ticket Info */}
-          <Card title="Ticket Information">
+          <Card title={t('ticketForm.ticketInformation')}>
             <Descriptions column={1} size="small">
-              <Descriptions.Item label="Ticket ID">
+              <Descriptions.Item label={t('tickets.ticketId')}>
                 {ticket.ticket_number}
               </Descriptions.Item>
-              <Descriptions.Item label="Created By">
+              <Descriptions.Item label={t('tickets.createdBy')}>
                 {ticket.user?.name}
               </Descriptions.Item>
-              <Descriptions.Item label="Created At">
+              <Descriptions.Item label={t('tickets.createdAt')}>
                 {dayjs(ticket.created_at).format('MMM DD, YYYY HH:mm')}
               </Descriptions.Item>
-              <Descriptions.Item label="Last Updated">
+              <Descriptions.Item label={t('tickets.lastUpdated')}>
                 {dayjs(ticket.updated_at).format('MMM DD, YYYY HH:mm')}
               </Descriptions.Item>
               {ticket.assignee && (
-                <Descriptions.Item label="Assigned To">
+                <Descriptions.Item label={t('tickets.assignedTo')}>
                   {ticket.assignee.name}
                 </Descriptions.Item>
               )}
@@ -581,27 +582,26 @@ const TicketEdit: React.FC = () => {
 
           {/* Edit Permissions Info */}
           {!canManage && (
-            <Card title="Edit Permissions" style={{ marginTop: 16 }}>
+            <Card title={t('ticketForm.editPermissions')} style={{ marginTop: 16 }}>
               <Text type="secondary">
-                As a user, you can only edit tickets that are in "Open" status.
-                Once a ticket is being processed, you can only add comments.
+                {t('ticketForm.editPermissionsDesc')}
               </Text>
             </Card>
           )}
 
           {/* Status Info */}
           {canManage && (
-            <Card title="Status Information" style={{ marginTop: 16 }}>
+            <Card title={t('ticketForm.statusInformation')} style={{ marginTop: 16 }}>
               <Space direction="vertical" style={{ width: '100%' }}>
                 {statusOptions.map((option) => (
                   <div key={option.value}>
                     <Tag color={option.color}>{option.label}</Tag>
                     <Text type="secondary" style={{ fontSize: 12 }}>
-                      {option.value === 'open' && ' - New ticket awaiting review'}
-                      {option.value === 'in_progress' && ' - Being worked on'}
-                      {option.value === 'pending' && ' - Waiting for user response'}
-                      {option.value === 'resolved' && ' - Solution provided'}
-                      {option.value === 'closed' && ' - Ticket completed'}
+                      {option.value === 'open' && ` - ${t('ticketForm.openDesc')}`}
+                      {option.value === 'in_progress' && ` - ${t('ticketForm.inProgressDesc')}`}
+                      {option.value === 'pending' && ` - ${t('ticketForm.pendingDesc')}`}
+                      {option.value === 'resolved' && ` - ${t('ticketForm.resolvedDesc')}`}
+                      {option.value === 'closed' && ` - ${t('ticketForm.closedDesc')}`}
                     </Text>
                   </div>
                 ))}

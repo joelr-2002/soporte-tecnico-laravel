@@ -133,7 +133,7 @@ const ResponseTemplates: React.FC = () => {
     setSubmitting(true);
     try {
       await api.post('/response-templates', values);
-      message.success('Template created successfully');
+      message.success(t('templates.createdSuccessfully'));
       setCreateModalVisible(false);
       createForm.resetFields();
       fetchTemplates();
@@ -151,7 +151,7 @@ const ResponseTemplates: React.FC = () => {
     setSubmitting(true);
     try {
       await api.put(`/response-templates/${editingTemplate.id}`, values);
-      message.success('Template updated successfully');
+      message.success(t('templates.updatedSuccessfully'));
       setEditModalVisible(false);
       setEditingTemplate(null);
       editForm.resetFields();
@@ -167,7 +167,7 @@ const ResponseTemplates: React.FC = () => {
   const handleDelete = async (id: number) => {
     try {
       await api.delete(`/response-templates/${id}`);
-      message.success('Template deleted successfully');
+      message.success(t('templates.deletedSuccessfully'));
       fetchTemplates();
     } catch (error) {
       message.error(getErrorMessage(error));
@@ -178,9 +178,9 @@ const ResponseTemplates: React.FC = () => {
   const handleCopy = async (content: string) => {
     try {
       await navigator.clipboard.writeText(content);
-      message.success('Template copied to clipboard');
+      message.success(t('templates.copiedToClipboard'));
     } catch {
-      message.error('Failed to copy template');
+      message.error(t('templates.failedToCopy'));
     }
   };
 
@@ -198,7 +198,7 @@ const ResponseTemplates: React.FC = () => {
   // Table columns
   const columns: ColumnsType<ResponseTemplate> = [
     {
-      title: 'Name',
+      title: t('templates.name'),
       dataIndex: 'name',
       key: 'name',
       width: 200,
@@ -206,7 +206,7 @@ const ResponseTemplates: React.FC = () => {
       render: (text) => <Text strong>{text}</Text>,
     },
     {
-      title: 'Category',
+      title: t('tickets.category'),
       dataIndex: 'category',
       key: 'category',
       width: 150,
@@ -214,12 +214,12 @@ const ResponseTemplates: React.FC = () => {
         category ? (
           <Tag color="blue">{category.name}</Tag>
         ) : (
-          <Tag color="default">All Categories</Tag>
+          <Tag color="default">{t('templates.allCategories')}</Tag>
         )
       ),
     },
     {
-      title: 'Content Preview',
+      title: t('templates.contentPreview'),
       dataIndex: 'content',
       key: 'content',
       ellipsis: true,
@@ -235,34 +235,34 @@ const ResponseTemplates: React.FC = () => {
       ),
     },
     {
-      title: 'Actions',
+      title: t('templates.actions'),
       key: 'actions',
       width: 150,
       align: 'center',
       render: (_, record) => (
         <Space>
-          <Tooltip title="Copy">
+          <Tooltip title={t('templates.copy')}>
             <Button
               type="text"
               icon={<CopyOutlined />}
               onClick={() => handleCopy(record.content)}
             />
           </Tooltip>
-          <Tooltip title="Edit">
+          <Tooltip title={t('templates.edit')}>
             <Button
               type="text"
               icon={<EditOutlined />}
               onClick={() => openEditModal(record)}
             />
           </Tooltip>
-          <Tooltip title="Delete">
+          <Tooltip title={t('common.delete')}>
             <Popconfirm
-              title="Delete Template"
-              description="Are you sure you want to delete this template?"
+              title={t('templates.deleteTemplate')}
+              description={t('templates.confirmDelete')}
               onConfirm={() => handleDelete(record.id)}
-              okText="Delete"
+              okText={t('common.delete')}
               okType="danger"
-              cancelText="Cancel"
+              cancelText={t('common.cancel')}
             >
               <Button
                 type="text"
@@ -281,7 +281,7 @@ const ResponseTemplates: React.FC = () => {
       <div style={{ marginBottom: 24 }}>
         <Row justify="space-between" align="middle">
           <Col>
-            <Title level={4} style={{ margin: 0 }}>Response Templates</Title>
+            <Title level={4} style={{ margin: 0 }}>{t('templates.title')}</Title>
           </Col>
           <Col>
             <Space>
@@ -289,7 +289,7 @@ const ResponseTemplates: React.FC = () => {
                 icon={<ReloadOutlined />}
                 onClick={() => fetchTemplates()}
               >
-                Refresh
+                {t('templates.refresh')}
               </Button>
               <Button
                 type="primary"
@@ -299,7 +299,7 @@ const ResponseTemplates: React.FC = () => {
                   setCreateModalVisible(true);
                 }}
               >
-                New Template
+                {t('templates.newTemplate')}
               </Button>
             </Space>
           </Col>
@@ -311,7 +311,7 @@ const ResponseTemplates: React.FC = () => {
         <Row gutter={16}>
           <Col xs={24} sm={12} md={8}>
             <Input
-              placeholder="Search templates..."
+              placeholder={t('templates.searchTemplates')}
               prefix={<SearchOutlined />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
@@ -324,7 +324,7 @@ const ResponseTemplates: React.FC = () => {
           </Col>
           <Col xs={24} sm={12} md={6}>
             <Select
-              placeholder="Filter by category"
+              placeholder={t('templates.filterByCategory')}
               style={{ width: '100%' }}
               value={categoryFilter}
               onChange={(value) => {
@@ -357,7 +357,7 @@ const ResponseTemplates: React.FC = () => {
 
       {/* Create Modal */}
       <Modal
-        title="Create Template"
+        title={t('templates.create')}
         open={createModalVisible}
         onCancel={() => {
           setCreateModalVisible(false);
@@ -374,7 +374,7 @@ const ResponseTemplates: React.FC = () => {
         >
           <Form.Item
             name="name"
-            label="Name"
+            label={t('templates.name')}
             rules={[
               { required: true, message: 'Please enter template name' },
               { max: 255, message: 'Name cannot exceed 255 characters' },
@@ -385,11 +385,11 @@ const ResponseTemplates: React.FC = () => {
 
           <Form.Item
             name="category_id"
-            label="Category"
+            label={t('tickets.category')}
             tooltip="Leave empty to make this template available for all categories"
           >
             <Select
-              placeholder="Select category (optional)"
+              placeholder={t('templates.selectCategoryOptional')}
               allowClear
             >
               {categories.map((cat) => (
@@ -402,7 +402,7 @@ const ResponseTemplates: React.FC = () => {
 
           <Form.Item
             name="content"
-            label="Content"
+            label={t('templates.content')}
             rules={[
               { required: true, message: 'Please enter template content' },
             ]}
@@ -420,10 +420,10 @@ const ResponseTemplates: React.FC = () => {
                 setCreateModalVisible(false);
                 createForm.resetFields();
               }}>
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button type="primary" htmlType="submit" loading={submitting}>
-                Create
+                {t('templates.create')}
               </Button>
             </Space>
           </Form.Item>
@@ -432,7 +432,7 @@ const ResponseTemplates: React.FC = () => {
 
       {/* Edit Modal */}
       <Modal
-        title="Edit Template"
+        title={t('templates.edit')}
         open={editModalVisible}
         onCancel={() => {
           setEditModalVisible(false);
@@ -450,7 +450,7 @@ const ResponseTemplates: React.FC = () => {
         >
           <Form.Item
             name="name"
-            label="Name"
+            label={t('templates.name')}
             rules={[
               { required: true, message: 'Please enter template name' },
               { max: 255, message: 'Name cannot exceed 255 characters' },
@@ -461,11 +461,11 @@ const ResponseTemplates: React.FC = () => {
 
           <Form.Item
             name="category_id"
-            label="Category"
+            label={t('tickets.category')}
             tooltip="Leave empty to make this template available for all categories"
           >
             <Select
-              placeholder="Select category (optional)"
+              placeholder={t('templates.selectCategoryOptional')}
               allowClear
             >
               {categories.map((cat) => (
@@ -478,7 +478,7 @@ const ResponseTemplates: React.FC = () => {
 
           <Form.Item
             name="content"
-            label="Content"
+            label={t('templates.content')}
             rules={[
               { required: true, message: 'Please enter template content' },
             ]}
@@ -497,10 +497,10 @@ const ResponseTemplates: React.FC = () => {
                 setEditingTemplate(null);
                 editForm.resetFields();
               }}>
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button type="primary" htmlType="submit" loading={submitting}>
-                Update
+                {t('templates.update')}
               </Button>
             </Space>
           </Form.Item>

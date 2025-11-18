@@ -26,17 +26,11 @@ import { useNavigate } from 'react-router-dom';
 import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
 import api, { getErrorMessage, getValidationErrors } from '../../services/api';
 import type { Category, TicketFormData } from '../../types';
+import { useTranslation } from '@/i18n';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 const { Dragger } = Upload;
-
-const priorityOptions = [
-  { value: 'low', label: 'Low', color: 'default' },
-  { value: 'medium', label: 'Medium', color: 'blue' },
-  { value: 'high', label: 'High', color: 'orange' },
-  { value: 'urgent', label: 'Urgent', color: 'red' },
-];
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_FILE_TYPES = [
@@ -54,10 +48,18 @@ const ALLOWED_FILE_TYPES = [
 
 const TicketCreate: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+
+  const priorityOptions = [
+    { value: 'low', label: t('priority.low'), color: 'default' },
+    { value: 'medium', label: t('priority.medium'), color: 'blue' },
+    { value: 'high', label: t('priority.high'), color: 'orange' },
+    { value: 'urgent', label: t('priority.urgent'), color: 'red' },
+  ];
 
   // Fetch categories
   useEffect(() => {
@@ -66,7 +68,7 @@ const TicketCreate: React.FC = () => {
         const response = await api.get<{ data: Category[] }>('/categories');
         setCategories(response.data.data || []);
       } catch (error) {
-        message.error('Failed to load categories');
+        message.error(t('ticketForm.failedToLoadCategories'));
       }
     };
     fetchCategories();
@@ -95,7 +97,7 @@ const TicketCreate: React.FC = () => {
         },
       });
 
-      message.success('Ticket created successfully');
+      message.success(t('ticketForm.ticketCreatedSuccessfully'));
       navigate(`/tickets/${response.data.data.id}`);
     } catch (error) {
       const validationErrors = getValidationErrors(error);
@@ -120,13 +122,13 @@ const TicketCreate: React.FC = () => {
     beforeUpload: (file) => {
       // Check file size
       if (file.size > MAX_FILE_SIZE) {
-        message.error(`${file.name} is too large. Maximum size is 10MB.`);
+        message.error(`${file.name} ${t('ticketForm.fileTooLarge')}`);
         return Upload.LIST_IGNORE;
       }
 
       // Check file type
       if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-        message.error(`${file.name} is not a supported file type.`);
+        message.error(`${file.name} ${t('ticketForm.fileTypeNotSupported')}`);
         return Upload.LIST_IGNORE;
       }
 
@@ -168,13 +170,13 @@ const TicketCreate: React.FC = () => {
           onClick={() => navigate('/tickets/list')}
           style={{ marginBottom: 16 }}
         >
-          Back to Tickets
+          {t('ticketForm.backToTickets')}
         </Button>
         <Title level={4} style={{ margin: 0 }}>
-          Create New Ticket
+          {t('ticketForm.createNewTicket')}
         </Title>
         <Text type="secondary">
-          Fill in the details below to create a new support ticket
+          {t('ticketForm.fillInDetails')}
         </Text>
       </div>
 
@@ -191,15 +193,15 @@ const TicketCreate: React.FC = () => {
             >
               <Form.Item
                 name="title"
-                label="Title"
+                label={t('tickets.title')}
                 rules={[
-                  { required: true, message: 'Please enter a title' },
-                  { min: 5, message: 'Title must be at least 5 characters' },
-                  { max: 255, message: 'Title cannot exceed 255 characters' },
+                  { required: true, message: t('ticketForm.titleRequired') },
+                  { min: 5, message: t('ticketForm.titleMinLength') },
+                  { max: 255, message: t('ticketForm.titleMaxLength') },
                 ]}
               >
                 <Input
-                  placeholder="Brief summary of your issue"
+                  placeholder={t('ticketForm.briefSummary')}
                   maxLength={255}
                   showCount
                 />
@@ -207,14 +209,14 @@ const TicketCreate: React.FC = () => {
 
               <Form.Item
                 name="description"
-                label="Description"
+                label={t('tickets.description')}
                 rules={[
-                  { required: true, message: 'Please enter a description' },
-                  { min: 20, message: 'Description must be at least 20 characters' },
+                  { required: true, message: t('ticketForm.descriptionRequired') },
+                  { min: 20, message: t('ticketForm.descriptionMinLength') },
                 ]}
               >
                 <TextArea
-                  placeholder="Provide detailed information about your issue. Include any steps to reproduce, error messages, or relevant context."
+                  placeholder={t('ticketForm.detailedInfo')}
                   rows={8}
                   showCount
                   maxLength={5000}
@@ -225,11 +227,11 @@ const TicketCreate: React.FC = () => {
                 <Col xs={24} sm={12}>
                   <Form.Item
                     name="category_id"
-                    label="Category"
-                    rules={[{ required: true, message: 'Please select a category' }]}
+                    label={t('tickets.category')}
+                    rules={[{ required: true, message: t('ticketForm.categoryRequired') }]}
                   >
                     <Select
-                      placeholder="Select category"
+                      placeholder={t('ticketForm.selectCategory')}
                       showSearch
                       optionFilterProp="children"
                     >
@@ -244,10 +246,10 @@ const TicketCreate: React.FC = () => {
                 <Col xs={24} sm={12}>
                   <Form.Item
                     name="priority"
-                    label="Priority"
-                    rules={[{ required: true, message: 'Please select a priority' }]}
+                    label={t('tickets.priority')}
+                    rules={[{ required: true, message: t('ticketForm.priorityRequired') }]}
                   >
-                    <Select placeholder="Select priority">
+                    <Select placeholder={t('ticketForm.selectPriority')}>
                       {priorityOptions.map((option) => (
                         <Select.Option key={option.value} value={option.value}>
                           <Tag color={option.color}>{option.label}</Tag>
@@ -258,7 +260,7 @@ const TicketCreate: React.FC = () => {
                 </Col>
               </Row>
 
-              <Divider>Attachments</Divider>
+              <Divider>{t('ticketForm.attachments')}</Divider>
 
               <Form.Item>
                 <Dragger {...uploadProps}>
@@ -266,11 +268,10 @@ const TicketCreate: React.FC = () => {
                     <InboxOutlined />
                   </p>
                   <p className="ant-upload-text">
-                    Click or drag files to this area to upload
+                    {t('ticketForm.clickOrDrag')}
                   </p>
                   <p className="ant-upload-hint">
-                    Support for images, PDFs, documents, and archives.
-                    Maximum file size: 10MB per file.
+                    {t('ticketForm.supportedFormats')}
                   </p>
                 </Dragger>
               </Form.Item>
@@ -315,10 +316,10 @@ const TicketCreate: React.FC = () => {
               <Form.Item>
                 <Space>
                   <Button type="primary" htmlType="submit" loading={loading}>
-                    Create Ticket
+                    {t('ticketForm.createTicket')}
                   </Button>
                   <Button onClick={() => navigate('/tickets/list')}>
-                    Cancel
+                    {t('common.cancel')}
                   </Button>
                 </Space>
               </Form.Item>
@@ -327,16 +328,16 @@ const TicketCreate: React.FC = () => {
         </Col>
 
         <Col xs={24} lg={8}>
-          <Card title="Tips for Creating a Good Ticket">
+          <Card title={t('ticketForm.tipsTitle')}>
             <List
               size="small"
               dataSource={[
-                'Use a clear, descriptive title',
-                'Provide detailed steps to reproduce the issue',
-                'Include any error messages you see',
-                'Attach screenshots if helpful',
-                'Select the appropriate category and priority',
-                'Check if a similar ticket already exists',
+                t('ticketForm.tipClearTitle'),
+                t('ticketForm.tipStepsToReproduce'),
+                t('ticketForm.tipErrorMessages'),
+                t('ticketForm.tipScreenshots'),
+                t('ticketForm.tipAppropriateCategory'),
+                t('ticketForm.tipCheckSimilar'),
               ]}
               renderItem={(item) => (
                 <List.Item>
@@ -346,23 +347,23 @@ const TicketCreate: React.FC = () => {
             />
           </Card>
 
-          <Card title="Priority Guidelines" style={{ marginTop: 16 }}>
+          <Card title={t('ticketForm.priorityGuidelines')} style={{ marginTop: 16 }}>
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
-                <Tag color="default">Low</Tag>
-                <Text type="secondary">General questions, minor issues</Text>
+                <Tag color="default">{t('priority.low')}</Tag>
+                <Text type="secondary">{t('ticketForm.lowDesc')}</Text>
               </div>
               <div>
-                <Tag color="blue">Medium</Tag>
-                <Text type="secondary">Standard issues affecting work</Text>
+                <Tag color="blue">{t('priority.medium')}</Tag>
+                <Text type="secondary">{t('ticketForm.mediumDesc')}</Text>
               </div>
               <div>
-                <Tag color="orange">High</Tag>
-                <Text type="secondary">Important issues needing quick attention</Text>
+                <Tag color="orange">{t('priority.high')}</Tag>
+                <Text type="secondary">{t('ticketForm.highDesc')}</Text>
               </div>
               <div>
-                <Tag color="red">Urgent</Tag>
-                <Text type="secondary">Critical issues blocking work</Text>
+                <Tag color="red">{t('priority.urgent')}</Tag>
+                <Text type="secondary">{t('ticketForm.urgentDesc')}</Text>
               </div>
             </Space>
           </Card>

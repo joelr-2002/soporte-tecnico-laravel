@@ -5,6 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import { useTranslation } from '@/i18n';
 import AuthLayout from '@/layouts/auth-layout';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
@@ -22,10 +23,12 @@ export default function Login({
     canResetPassword,
     canRegister,
 }: LoginProps) {
+    const { t } = useTranslation();
+
     return (
         <AuthLayout
-            title="Log in to your account"
-            description="Enter your email and password below to log in"
+            title={t('authPages.loginTitle')}
+            description={t('authPages.loginSubtitle')}
         >
             <Head title="Log in" />
 
@@ -38,7 +41,7 @@ export default function Login({
                     <>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
+                                <Label htmlFor="email">{t('authPages.emailLabel')}</Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -54,14 +57,14 @@ export default function Login({
 
                             <div className="grid gap-2">
                                 <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
+                                    <Label htmlFor="password">{t('authPages.passwordLabel')}</Label>
                                     {canResetPassword && (
                                         <TextLink
                                             href={request()}
                                             className="ml-auto text-sm"
                                             tabIndex={5}
                                         >
-                                            Forgot password?
+                                            {t('authPages.forgotPasswordLink')}
                                         </TextLink>
                                     )}
                                 </div>
@@ -83,7 +86,7 @@ export default function Login({
                                     name="remember"
                                     tabIndex={3}
                                 />
-                                <Label htmlFor="remember">Remember me</Label>
+                                <Label htmlFor="remember">{t('authPages.rememberMe')}</Label>
                             </div>
 
                             <Button
@@ -94,15 +97,15 @@ export default function Login({
                                 data-test="login-button"
                             >
                                 {processing && <Spinner />}
-                                Log in
+                                {t('authPages.loginButton')}
                             </Button>
                         </div>
 
                         {canRegister && (
                             <div className="text-center text-sm text-muted-foreground">
-                                Don't have an account?{' '}
+                                {t('authPages.noAccountLink')}{' '}
                                 <TextLink href={register()} tabIndex={5}>
-                                    Sign up
+                                    {t('authPages.signUpLink')}
                                 </TextLink>
                             </div>
                         )}

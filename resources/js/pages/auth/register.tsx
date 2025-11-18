@@ -1,3 +1,4 @@
+import { useTranslation } from '@/i18n';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
 import { Form, Head } from '@inertiajs/react';
@@ -11,10 +12,12 @@ import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
 
 export default function Register() {
+    const { t } = useTranslation();
+
     return (
         <AuthLayout
-            title="Create an account"
-            description="Enter your details below to create your account"
+            title={t('authPages.registerTitle')}
+            description={t('authPages.registerSubtitle')}
         >
             <Head title="Register" />
             <Form
@@ -27,7 +30,7 @@ export default function Register() {
                     <>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
+                                <Label htmlFor="name">{t('authPages.nameLabel')}</Label>
                                 <Input
                                     id="name"
                                     type="text"
@@ -45,7 +48,7 @@ export default function Register() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
+                                <Label htmlFor="email">{t('authPages.emailLabel')}</Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -59,7 +62,7 @@ export default function Register() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="password">Password</Label>
+                                <Label htmlFor="password">{t('authPages.passwordLabel')}</Label>
                                 <Input
                                     id="password"
                                     type="password"
@@ -74,7 +77,7 @@ export default function Register() {
 
                             <div className="grid gap-2">
                                 <Label htmlFor="password_confirmation">
-                                    Confirm password
+                                    {t('authPages.confirmPasswordLabel')}
                                 </Label>
                                 <Input
                                     id="password_confirmation"
@@ -97,14 +100,14 @@ export default function Register() {
                                 data-test="register-user-button"
                             >
                                 {processing && <Spinner />}
-                                Create account
+                                {t('authPages.registerButton')}
                             </Button>
                         </div>
 
                         <div className="text-center text-sm text-muted-foreground">
-                            Already have an account?{' '}
+                            {t('authPages.hasAccountLink')}{' '}
                             <TextLink href={login()} tabIndex={6}>
-                                Log in
+                                {t('authPages.loginLink')}
                             </TextLink>
                         </div>
                     </>
