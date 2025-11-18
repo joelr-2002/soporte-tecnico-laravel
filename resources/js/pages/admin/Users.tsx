@@ -83,10 +83,10 @@ const Users: React.FC = () => {
         role: roleFilter,
       });
       setUsers(response.data);
-      setPagination({
-        ...pagination,
+      setPagination(prev => ({
+        ...prev,
         total: response.total,
-      });
+      }));
     } catch (error) {
       message.error(error instanceof Error ? error.message : t('users.failedToFetch'));
     } finally {
