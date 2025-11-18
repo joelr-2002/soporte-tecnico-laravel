@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Input, Button, Checkbox, Typography, message, Divider } from 'antd';
+import { Form, Input, Button, Checkbox, Typography, Divider, App } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
@@ -12,6 +12,7 @@ const Login: React.FC = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { login, isLoading } = useAuthStore();
+  const { message } = App.useApp();
 
   const onFinish = async (values: LoginCredentials) => {
     try {
