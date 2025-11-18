@@ -51,6 +51,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import api, { getErrorMessage } from '../../services/api';
 import { useAuthStore } from '../../stores/authStore';
+import { useTranslation } from '../../i18n';
 import type { Ticket, Comment, User, Attachment } from '../../types';
 
 dayjs.extend(relativeTime);
@@ -115,6 +116,7 @@ const TicketView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuthStore();
+  const { t } = useTranslation();
   const isAdmin = user?.role === 'admin';
   const isAgent = user?.role === 'agent';
   const canManage = isAdmin || isAgent;
@@ -672,7 +674,7 @@ const TicketView: React.FC = () => {
             <Divider />
             <div>
               <TextArea
-                placeholder="Write a comment..."
+                placeholder={t('placeholders.comment')}
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 rows={4}
@@ -753,9 +755,9 @@ const TicketView: React.FC = () => {
 
                 <Divider />
 
-                <Text strong>Assign To</Text>
+                <Text strong>{t('tickets.assignTo')}</Text>
                 <Select
-                  placeholder="Select agent"
+                  placeholder={t('placeholders.selectAgent')}
                   style={{ width: '100%' }}
                   value={ticket.assigned_to || undefined}
                   onChange={handleAssign}

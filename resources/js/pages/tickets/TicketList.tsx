@@ -38,6 +38,7 @@ import type { MenuProps } from 'antd';
 import dayjs from 'dayjs';
 import api, { getErrorMessage } from '../../services/api';
 import { useAuthStore } from '../../stores/authStore';
+import { useTranslation } from '../../i18n';
 import type { Ticket, Category, User, PaginatedResponse } from '../../types';
 
 const { RangePicker } = DatePicker;
@@ -83,6 +84,7 @@ const priorityLabels: Record<string, string> = {
 const TicketList: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
+  const { t } = useTranslation();
   const isAdmin = user?.role === 'admin';
   const isAgent = user?.role === 'agent';
   const canManage = isAdmin || isAgent;
@@ -529,7 +531,7 @@ const TicketList: React.FC = () => {
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={12} md={8} lg={6}>
             <Input
-              placeholder="Search tickets..."
+              placeholder={t('placeholders.searchTickets')}
               prefix={<SearchOutlined />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
@@ -540,7 +542,7 @@ const TicketList: React.FC = () => {
           <Col xs={24} sm={12} md={8} lg={4}>
             <Select
               mode="multiple"
-              placeholder="Status"
+              placeholder={t('placeholders.filterByStatus')}
               style={{ width: '100%' }}
               value={statusFilter}
               onChange={setStatusFilter}
@@ -557,7 +559,7 @@ const TicketList: React.FC = () => {
           <Col xs={24} sm={12} md={8} lg={4}>
             <Select
               mode="multiple"
-              placeholder="Priority"
+              placeholder={t('placeholders.filterByPriority')}
               style={{ width: '100%' }}
               value={priorityFilter}
               onChange={setPriorityFilter}
@@ -573,7 +575,7 @@ const TicketList: React.FC = () => {
           </Col>
           <Col xs={24} sm={12} md={8} lg={4}>
             <Select
-              placeholder="Category"
+              placeholder={t('placeholders.filterByCategory')}
               style={{ width: '100%' }}
               value={categoryFilter}
               onChange={setCategoryFilter}
@@ -591,7 +593,7 @@ const TicketList: React.FC = () => {
           {canManage && (
             <Col xs={24} sm={12} md={8} lg={4}>
               <Select
-                placeholder="Assigned To"
+                placeholder={t('tickets.assignedTo')}
                 style={{ width: '100%' }}
                 value={assignedFilter}
                 onChange={setAssignedFilter}
@@ -599,7 +601,7 @@ const TicketList: React.FC = () => {
                 showSearch
                 optionFilterProp="children"
               >
-                <Select.Option value={0}>Unassigned</Select.Option>
+                <Select.Option value={0}>{t('tickets.unassigned')}</Select.Option>
                 {agents.map((agent) => (
                   <Select.Option key={agent.id} value={agent.id}>
                     {agent.name}
@@ -676,7 +678,7 @@ const TicketList: React.FC = () => {
 
       {/* Bulk Assign Modal */}
       <Modal
-        title="Assign Tickets"
+        title={t('tickets.assignTo')}
         open={bulkAssignModal}
         onOk={handleBulkAssign}
         onCancel={() => {
@@ -684,9 +686,9 @@ const TicketList: React.FC = () => {
           setBulkAssignee(undefined);
         }}
       >
-        <p>Assign {selectedRowKeys.length} tickets to:</p>
+        <p>{t('tickets.assignTo')} {selectedRowKeys.length} tickets:</p>
         <Select
-          placeholder="Select agent"
+          placeholder={t('placeholders.selectAgent')}
           style={{ width: '100%' }}
           value={bulkAssignee}
           onChange={setBulkAssignee}
@@ -703,7 +705,7 @@ const TicketList: React.FC = () => {
 
       {/* Bulk Status Change Modal */}
       <Modal
-        title="Change Status"
+        title={t('tickets.status')}
         open={bulkStatusModal}
         onOk={handleBulkStatusChange}
         onCancel={() => {
@@ -711,9 +713,9 @@ const TicketList: React.FC = () => {
           setBulkStatus(undefined);
         }}
       >
-        <p>Change status of {selectedRowKeys.length} tickets to:</p>
+        <p>{t('tickets.status')} ({selectedRowKeys.length} tickets):</p>
         <Select
-          placeholder="Select status"
+          placeholder={t('placeholders.selectStatus')}
           style={{ width: '100%' }}
           value={bulkStatus}
           onChange={setBulkStatus}
