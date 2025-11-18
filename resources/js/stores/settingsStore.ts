@@ -11,18 +11,33 @@ interface SettingsState {
   fontSize: FontSize;
   highContrast: boolean;
   reducedMotion: boolean;
+  effectiveTheme: 'light' | 'dark';
 }
 
 interface SettingsActions {
   setLanguage: (language: Language) => void;
   setTheme: (theme: Theme) => void;
   setFontSize: (fontSize: FontSize) => void;
+  setHighContrast: (value: boolean) => void;
+  setReducedMotion: (value: boolean) => void;
   toggleHighContrast: () => void;
   toggleReducedMotion: () => void;
+  updateEffectiveTheme: () => void;
   resetSettings: () => void;
 }
 
 interface SettingsStore extends SettingsState, SettingsActions {}
+
+// Helper to determine effective theme based on system preference
+const getEffectiveTheme = (theme: Theme): 'light' | 'dark' => {
+  if (theme === 'system') {
+    if (typeof window !== 'undefined') {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    return 'light';
+  }
+  return theme;
+};
 
 const defaultSettings: SettingsState = {
   language: 'es',
@@ -30,18 +45,27 @@ const defaultSettings: SettingsState = {
   fontSize: 'medium',
   highContrast: false,
   reducedMotion: false,
+  effectiveTheme: 'light',
 };
 
 export const useSettingsStore = create<SettingsStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       ...defaultSettings,
+      effectiveTheme: getEffectiveTheme(defaultSettings.theme),
 
       setLanguage: (language) => set({ language }),
 
-      setTheme: (theme) => set({ theme }),
+      setTheme: (theme) => set({
+        theme,
+        effectiveTheme: getEffectiveTheme(theme)
+      }),
 
       setFontSize: (fontSize) => set({ fontSize }),
+
+      setHighContrast: (value) => set({ highContrast: value }),
+
+      setReducedMotion: (value) => set({ reducedMotion: value }),
 
       toggleHighContrast: () => set((state) => ({
         highContrast: !state.highContrast
@@ -51,7 +75,14 @@ export const useSettingsStore = create<SettingsStore>()(
         reducedMotion: !state.reducedMotion
       })),
 
-      resetSettings: () => set(defaultSettings),
+      updateEffectiveTheme: () => set((state) => ({
+        effectiveTheme: getEffectiveTheme(state.theme)
+      })),
+
+      resetSettings: () => set({
+        ...defaultSettings,
+        effectiveTheme: getEffectiveTheme(defaultSettings.theme)
+      }),
     }),
     {
       name: 'settings-storage',
