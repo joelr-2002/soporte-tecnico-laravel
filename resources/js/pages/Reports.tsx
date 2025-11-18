@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from '@/i18n';
 import {
   Card,
   Row,
@@ -43,21 +44,13 @@ const statusColors = ['#1890ff', '#faad14', '#52c41a', '#d9d9d9', '#ff4d4f'];
 const priorityColors = ['#d9d9d9', '#1890ff', '#fa8c16', '#ff4d4f'];
 const categoryColors = ['#1890ff', '#52c41a', '#faad14', '#ff4d4f', '#722ed1', '#13c2c2', '#eb2f96', '#fa541c'];
 
-// Quick date range options
-const quickRanges = [
-  { label: 'Today', value: 'today' },
-  { label: 'This Week', value: 'week' },
-  { label: 'This Month', value: 'month' },
-  { label: 'This Quarter', value: 'quarter' },
-  { label: 'This Year', value: 'year' },
-  { label: 'Custom', value: 'custom' },
-];
 
 // Simple pie chart component
 const SimplePieChart: React.FC<{
   data: { name: string; value: number; color: string }[];
   title: string;
 }> = ({ data, title }) => {
+  const { t } = useTranslation();
   const total = data.reduce((sum, item) => sum + item.value, 0);
 
   return (
@@ -87,7 +80,7 @@ const SimplePieChart: React.FC<{
           );
         })}
         {data.length === 0 && (
-          <Text type="secondary" style={{ textAlign: 'center' }}>No data available</Text>
+          <Text type="secondary" style={{ textAlign: 'center' }}>{t('reports.noDataAvailable')}</Text>
         )}
       </div>
     </div>
@@ -99,6 +92,7 @@ const SimpleBarChart: React.FC<{
   data: { name: string; value: number; color: string }[];
   title: string;
 }> = ({ data, title }) => {
+  const { t } = useTranslation();
   const maxValue = Math.max(...data.map((item) => item.value), 1);
 
   return (
@@ -135,7 +129,7 @@ const SimpleBarChart: React.FC<{
           </div>
         ))}
         {data.length === 0 && (
-          <Text type="secondary" style={{ textAlign: 'center' }}>No data available</Text>
+          <Text type="secondary" style={{ textAlign: 'center' }}>{t('reports.noDataAvailable')}</Text>
         )}
       </div>
     </div>
@@ -147,6 +141,7 @@ const SimpleLineChart: React.FC<{
   data: TicketsByPeriodData[];
   title: string;
 }> = ({ data, title }) => {
+  const { t } = useTranslation();
   const maxValue = Math.max(...data.map((item) => item.count), 1);
   const height = 200;
   const width = 100;
@@ -207,7 +202,7 @@ const SimpleLineChart: React.FC<{
         </div>
       ) : (
         <Text type="secondary" style={{ textAlign: 'center', display: 'block' }}>
-          No data available
+          {t('reports.noDataAvailable')}
         </Text>
       )}
     </div>
@@ -215,6 +210,18 @@ const SimpleLineChart: React.FC<{
 };
 
 const Reports: React.FC = () => {
+  const { t } = useTranslation();
+
+  // Quick date range options with translations
+  const quickRanges = [
+    { label: t('reports.today'), value: 'today' },
+    { label: t('reports.thisWeek'), value: 'week' },
+    { label: t('reports.thisMonth'), value: 'month' },
+    { label: t('reports.thisQuarter'), value: 'quarter' },
+    { label: t('reports.thisYear'), value: 'year' },
+    { label: t('reports.custom'), value: 'custom' },
+  ];
+
   // Date range states
   const [quickRange, setQuickRange] = useState<string>('month');
   const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs]>([
@@ -253,17 +260,17 @@ const Reports: React.FC = () => {
 
   // Available export columns
   const availableColumns = [
-    { label: 'Ticket Number', value: 'ticket_number' },
-    { label: 'Title', value: 'title' },
-    { label: 'Description', value: 'description' },
-    { label: 'Status', value: 'status' },
-    { label: 'Priority', value: 'priority' },
-    { label: 'Category', value: 'category' },
-    { label: 'Created By', value: 'user' },
-    { label: 'Assigned To', value: 'assignee' },
-    { label: 'Created At', value: 'created_at' },
-    { label: 'Updated At', value: 'updated_at' },
-    { label: 'Resolved At', value: 'resolved_at' },
+    { label: t('reports.ticketNumber'), value: 'ticket_number' },
+    { label: t('tickets.title'), value: 'title' },
+    { label: t('reports.description'), value: 'description' },
+    { label: t('tickets.status'), value: 'status' },
+    { label: t('tickets.priority'), value: 'priority' },
+    { label: t('tickets.category'), value: 'category' },
+    { label: t('reports.createdBy'), value: 'user' },
+    { label: t('reports.assignedTo'), value: 'assignee' },
+    { label: t('reports.createdAt'), value: 'created_at' },
+    { label: t('reports.updatedAt'), value: 'updated_at' },
+    { label: t('reports.resolvedAt'), value: 'resolved_at' },
   ];
 
   // Update date range based on quick selection
@@ -345,11 +352,11 @@ const Reports: React.FC = () => {
         });
       }
     } catch (error) {
-      message.error(error instanceof Error ? error.message : 'Failed to fetch report data');
+      message.error(error instanceof Error ? error.message : t('reports.failedToFetch'));
     } finally {
       setLoading(false);
     }
-  }, [dateRange, groupBy]);
+  }, [dateRange, groupBy, t]);
 
   useEffect(() => {
     fetchReportData();
@@ -358,7 +365,7 @@ const Reports: React.FC = () => {
   // Handle export
   const handleExport = async () => {
     if (exportColumns.length === 0) {
-      message.warning('Please select at least one column to export');
+      message.warning(t('reports.selectAtLeastOneColumn'));
       return;
     }
 
@@ -373,10 +380,10 @@ const Reports: React.FC = () => {
         blob,
         `tickets-report-${dateRange[0].format('YYYY-MM-DD')}-to-${dateRange[1].format('YYYY-MM-DD')}.csv`
       );
-      message.success('Report exported successfully');
+      message.success(t('reports.exportedSuccessfully'));
       setExportModalVisible(false);
     } catch (error) {
-      message.error(error instanceof Error ? error.message : 'Failed to export report');
+      message.error(error instanceof Error ? error.message : t('reports.failedToExport'));
     } finally {
       setExporting(false);
     }
@@ -385,27 +392,27 @@ const Reports: React.FC = () => {
   // Agent performance table columns
   const agentColumns: ColumnsType<AgentPerformanceData> = [
     {
-      title: 'Agent',
+      title: t('reports.agent'),
       dataIndex: 'agent_name',
       key: 'agent_name',
       render: (text) => <Text strong>{text}</Text>,
     },
     {
-      title: 'Total Assigned',
+      title: t('reports.totalAssigned'),
       dataIndex: 'total_assigned',
       key: 'total_assigned',
       align: 'center',
       sorter: (a, b) => a.total_assigned - b.total_assigned,
     },
     {
-      title: 'Total Resolved',
+      title: t('reports.totalResolved'),
       dataIndex: 'total_resolved',
       key: 'total_resolved',
       align: 'center',
       sorter: (a, b) => a.total_resolved - b.total_resolved,
     },
     {
-      title: 'Avg Resolution Time',
+      title: t('reports.avgResolutionTime'),
       dataIndex: 'avg_resolution_time_hours',
       key: 'avg_resolution_time_hours',
       align: 'center',
@@ -418,7 +425,7 @@ const Reports: React.FC = () => {
       },
     },
     {
-      title: 'Resolution Rate',
+      title: t('reports.resolutionRate'),
       dataIndex: 'resolution_rate',
       key: 'resolution_rate',
       align: 'center',
@@ -458,7 +465,7 @@ const Reports: React.FC = () => {
         <div style={{ marginBottom: 24 }}>
           <Row justify="space-between" align="middle">
             <Col>
-              <Title level={4} style={{ margin: 0 }}>Reports & Analytics</Title>
+              <Title level={4} style={{ margin: 0 }}>{t('reports.title')}</Title>
             </Col>
             <Col>
               <Space>
@@ -466,14 +473,14 @@ const Reports: React.FC = () => {
                   icon={<ReloadOutlined />}
                   onClick={() => fetchReportData()}
                 >
-                  Refresh
+                  {t('common.refresh')}
                 </Button>
                 <Button
                   type="primary"
                   icon={<DownloadOutlined />}
                   onClick={() => setExportModalVisible(true)}
                 >
-                  Export CSV
+                  {t('reports.exportCSV')}
                 </Button>
               </Space>
             </Col>
@@ -485,7 +492,7 @@ const Reports: React.FC = () => {
           <Row gutter={[16, 16]} align="middle">
             <Col xs={24} md={12}>
               <Space wrap>
-                <Text strong>Quick Range:</Text>
+                <Text strong>{t('reports.quickRange')}</Text>
                 <Segmented
                   options={quickRanges}
                   value={quickRange}
@@ -495,7 +502,7 @@ const Reports: React.FC = () => {
             </Col>
             <Col xs={24} md={12}>
               <Space wrap>
-                <Text strong>Custom Range:</Text>
+                <Text strong>{t('reports.customRange')}</Text>
                 <RangePicker
                   value={dateRange}
                   onChange={(dates) => {
@@ -516,7 +523,7 @@ const Reports: React.FC = () => {
             <Card>
               <SimplePieChart
                 data={formattedStatusData}
-                title="Tickets by Status"
+                title={t('reports.ticketsByStatus')}
               />
             </Card>
           </Col>
@@ -524,7 +531,7 @@ const Reports: React.FC = () => {
             <Card>
               <SimplePieChart
                 data={formattedPriorityData}
-                title="Tickets by Priority"
+                title={t('reports.ticketsByPriority')}
               />
             </Card>
           </Col>
@@ -536,7 +543,7 @@ const Reports: React.FC = () => {
             <Card>
               <SimpleBarChart
                 data={formattedCategoryData}
-                title="Tickets by Category"
+                title={t('reports.ticketsByCategory')}
               />
             </Card>
           </Col>
@@ -549,14 +556,14 @@ const Reports: React.FC = () => {
                   style={{ width: 120 }}
                   size="small"
                 >
-                  <Select.Option value="day">Daily</Select.Option>
-                  <Select.Option value="week">Weekly</Select.Option>
-                  <Select.Option value="month">Monthly</Select.Option>
+                  <Select.Option value="day">{t('reports.daily')}</Select.Option>
+                  <Select.Option value="week">{t('reports.weekly')}</Select.Option>
+                  <Select.Option value="month">{t('reports.monthly')}</Select.Option>
                 </Select>
               </div>
               <SimpleLineChart
                 data={timeSeriesData}
-                title="Tickets Over Time"
+                title={t('reports.ticketsOverTime')}
               />
             </Card>
           </Col>
@@ -564,7 +571,7 @@ const Reports: React.FC = () => {
 
         {/* Agent Performance Table */}
         <Card style={{ marginBottom: 16 }}>
-          <Title level={5} style={{ marginBottom: 16 }}>Agent Performance</Title>
+          <Title level={5} style={{ marginBottom: 16 }}>{t('reports.agentPerformance')}</Title>
           <Table
             columns={agentColumns}
             dataSource={agentPerformance}
@@ -578,12 +585,12 @@ const Reports: React.FC = () => {
         <Card style={{ marginBottom: 16 }}>
           <Title level={5} style={{ marginBottom: 16 }}>
             <ClockCircleOutlined style={{ marginRight: 8 }} />
-            Resolution Time Statistics
+            {t('reports.resolutionTimeStats')}
           </Title>
           <Row gutter={[16, 16]}>
             <Col xs={12} md={6}>
               <Statistic
-                title="Average Resolution Time"
+                title={t('reports.averageResolutionTime')}
                 value={resolutionStats.avg_hours}
                 precision={1}
                 suffix="hours"
@@ -591,7 +598,7 @@ const Reports: React.FC = () => {
             </Col>
             <Col xs={12} md={6}>
               <Statistic
-                title="Median Resolution Time"
+                title={t('reports.medianResolutionTime')}
                 value={resolutionStats.median_hours}
                 precision={1}
                 suffix="hours"
@@ -599,7 +606,7 @@ const Reports: React.FC = () => {
             </Col>
             <Col xs={24} md={12}>
               <Text strong style={{ display: 'block', marginBottom: 8 }}>
-                By Priority:
+                {t('reports.byPriority')}
               </Text>
               <Space wrap>
                 {['low', 'medium', 'high', 'urgent'].map((priority) => {
@@ -625,22 +632,23 @@ const Reports: React.FC = () => {
 
         {/* Export Modal */}
         <Modal
-          title="Export Report"
+          title={t('reports.exportReport')}
           open={exportModalVisible}
           onCancel={() => setExportModalVisible(false)}
           onOk={handleExport}
-          okText="Export"
+          okText={t('reports.export')}
+          cancelText={t('common.cancel')}
           confirmLoading={exporting}
         >
           <div style={{ marginBottom: 16 }}>
-            <Text strong>Date Range:</Text>
+            <Text strong>{t('reports.dateRange')}</Text>
             <Text style={{ marginLeft: 8 }}>
               {dateRange[0].format('MMM DD, YYYY')} - {dateRange[1].format('MMM DD, YYYY')}
             </Text>
           </div>
           <div>
             <Text strong style={{ display: 'block', marginBottom: 8 }}>
-              Select Columns to Export:
+              {t('reports.selectColumnsToExport')}
             </Text>
             <Checkbox.Group
               options={availableColumns}

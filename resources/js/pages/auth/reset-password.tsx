@@ -1,3 +1,4 @@
+import { useTranslation } from '@/i18n';
 import { update } from '@/routes/password';
 import { Form, Head } from '@inertiajs/react';
 
@@ -14,10 +15,12 @@ interface ResetPasswordProps {
 }
 
 export default function ResetPassword({ token, email }: ResetPasswordProps) {
+    const { t } = useTranslation();
+
     return (
         <AuthLayout
-            title="Reset password"
-            description="Please enter your new password below"
+            title={t('authPages.resetPasswordTitle')}
+            description={t('authPages.resetPasswordSubtitle')}
         >
             <Head title="Reset password" />
 
@@ -29,7 +32,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                 {({ processing, errors }) => (
                     <div className="grid gap-6">
                         <div className="grid gap-2">
-                            <Label htmlFor="email">Email</Label>
+                            <Label htmlFor="email">{t('authPages.emailLabel')}</Label>
                             <Input
                                 id="email"
                                 type="email"
@@ -46,7 +49,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
+                            <Label htmlFor="password">{t('authPages.passwordLabel')}</Label>
                             <Input
                                 id="password"
                                 type="password"
@@ -61,7 +64,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
 
                         <div className="grid gap-2">
                             <Label htmlFor="password_confirmation">
-                                Confirm password
+                                {t('authPages.confirmPasswordLabel')}
                             </Label>
                             <Input
                                 id="password_confirmation"
@@ -84,7 +87,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                             data-test="reset-password-button"
                         >
                             {processing && <Spinner />}
-                            Reset password
+                            {t('authPages.resetPasswordButton')}
                         </Button>
                     </div>
                 )}

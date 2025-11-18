@@ -89,20 +89,7 @@ const priorityColors: Record<string, string> = {
   urgent: 'red',
 };
 
-const statusLabels: Record<string, string> = {
-  open: 'Open',
-  in_progress: 'In Progress',
-  pending: 'Pending',
-  resolved: 'Resolved',
-  closed: 'Closed',
-};
-
-const priorityLabels: Record<string, string> = {
-  low: 'Low',
-  medium: 'Medium',
-  high: 'High',
-  urgent: 'Urgent',
-};
+// Status and priority labels are now generated inside the component using translations
 
 const statusIcons: Record<string, React.ReactNode> = {
   open: <ClockCircleOutlined />,
@@ -120,6 +107,22 @@ const TicketView: React.FC = () => {
   const isAdmin = user?.role === 'admin';
   const isAgent = user?.role === 'agent';
   const canManage = isAdmin || isAgent;
+
+  // Translated labels
+  const statusLabels: Record<string, string> = {
+    open: t('status.open'),
+    in_progress: t('status.inProgress'),
+    pending: t('status.pending'),
+    resolved: t('status.resolved'),
+    closed: t('status.closed'),
+  };
+
+  const priorityLabels: Record<string, string> = {
+    low: t('priority.low'),
+    medium: t('priority.medium'),
+    high: t('priority.high'),
+    urgent: t('priority.urgent'),
+  };
 
   // State
   const [ticket, setTicket] = useState<Ticket | null>(null);
@@ -180,7 +183,7 @@ const TicketView: React.FC = () => {
   const handleStatusChange = async (newStatus: string) => {
     try {
       await api.patch(`/tickets/${id}/status`, { status: newStatus });
-      message.success('Status updated successfully');
+      message.success(t('ticketView.statusUpdatedSuccessfully'));
       fetchTicket();
     } catch (error) {
       message.error(getErrorMessage(error));
@@ -191,7 +194,7 @@ const TicketView: React.FC = () => {
   const handleAssign = async (assigneeId: number) => {
     try {
       await api.patch(`/tickets/${id}/assign`, { assigned_to: assigneeId });
-      message.success('Ticket assigned successfully');
+      message.success(t('ticketView.ticketAssignedSuccessfully'));
       fetchTicket();
     } catch (error) {
       message.error(getErrorMessage(error));
@@ -202,7 +205,7 @@ const TicketView: React.FC = () => {
   const handleDelete = async () => {
     try {
       await api.delete(`/tickets/${id}`);
-      message.success('Ticket deleted successfully');
+      message.success(t('ticketView.ticketDeletedSuccessfully'));
       navigate('/tickets/list');
     } catch (error) {
       message.error(getErrorMessage(error));
@@ -212,7 +215,7 @@ const TicketView: React.FC = () => {
   // Add comment
   const handleAddComment = async () => {
     if (!newComment.trim()) {
-      message.warning('Please enter a comment');
+      message.warning(t('ticketView.pleaseEnterComment'));
       return;
     }
 
@@ -233,7 +236,7 @@ const TicketView: React.FC = () => {
         },
       });
 
-      message.success('Comment added successfully');
+      message.success(t('ticketView.commentAddedSuccessfully'));
       setNewComment('');
       setIsInternal(false);
       setCommentFiles([]);
@@ -248,13 +251,13 @@ const TicketView: React.FC = () => {
   // Edit comment
   const handleEditComment = async (commentId: number) => {
     if (!editCommentText.trim()) {
-      message.warning('Please enter a comment');
+      message.warning(t('ticketView.pleaseEnterComment'));
       return;
     }
 
     try {
       await api.put(`/comments/${commentId}`, { content: editCommentText });
-      message.success('Comment updated successfully');
+      message.success(t('ticketView.commentUpdatedSuccessfully'));
       setEditingComment(null);
       setEditCommentText('');
       fetchTicket();
@@ -267,7 +270,7 @@ const TicketView: React.FC = () => {
   const handleDeleteComment = async (commentId: number) => {
     try {
       await api.delete(`/comments/${commentId}`);
-      message.success('Comment deleted successfully');
+      message.success(t('ticketView.commentDeletedSuccessfully'));
       fetchTicket();
     } catch (error) {
       message.error(getErrorMessage(error));
@@ -305,7 +308,7 @@ const TicketView: React.FC = () => {
     beforeUpload: (file) => {
       const isLt10M = file.size / 1024 / 1024 < 10;
       if (!isLt10M) {
-        message.error('File must be smaller than 10MB');
+        message.error(t('ticketView.fileMustBeSmaller'));
         return Upload.LIST_IGNORE;
       }
       return false;
@@ -335,7 +338,7 @@ const TicketView: React.FC = () => {
   }
 
   if (!ticket) {
-    return <Empty description="Ticket not found" />;
+    return <Empty description={t('ticketView.ticketNotFound')} />;
   }
 
   return (
@@ -347,7 +350,7 @@ const TicketView: React.FC = () => {
           onClick={() => navigate('/tickets/list')}
           style={{ marginBottom: 16 }}
         >
-          Back to Tickets
+          {t('ticketView.backToTickets')}
         </Button>
         <Row justify="space-between" align="middle">
           <Col>
@@ -370,19 +373,19 @@ const TicketView: React.FC = () => {
                   icon={<EditOutlined />}
                   onClick={() => navigate(`/tickets/${id}/edit`)}
                 >
-                  Edit
+                  {t('common.edit')}
                 </Button>
               )}
               {isAdmin && (
                 <Popconfirm
-                  title="Delete Ticket"
-                  description="Are you sure you want to delete this ticket?"
+                  title={t('ticketView.deleteTicket')}
+                  description={t('ticketView.confirmDeleteTicket')}
                   onConfirm={handleDelete}
-                  okText="Delete"
+                  okText={t('common.delete')}
                   okType="danger"
                 >
                   <Button danger icon={<DeleteOutlined />}>
-                    Delete
+                    {t('common.delete')}
                   </Button>
                 </Popconfirm>
               )}
@@ -410,10 +413,10 @@ const TicketView: React.FC = () => {
             />
 
             <Descriptions column={{ xs: 1, sm: 2 }} size="small">
-              <Descriptions.Item label="Category">
+              <Descriptions.Item label={t('tickets.category')}>
                 {ticket.category?.name || '-'}
               </Descriptions.Item>
-              <Descriptions.Item label="Created By">
+              <Descriptions.Item label={t('tickets.createdBy')}>
                 <Space>
                   <Avatar
                     size="small"
@@ -423,7 +426,7 @@ const TicketView: React.FC = () => {
                   {ticket.user?.name}
                 </Space>
               </Descriptions.Item>
-              <Descriptions.Item label="Assigned To">
+              <Descriptions.Item label={t('tickets.assignedTo')}>
                 {ticket.assignee ? (
                   <Space>
                     <Avatar
@@ -444,14 +447,14 @@ const TicketView: React.FC = () => {
                         trigger={['click']}
                       >
                         <Button type="link" size="small">
-                          Reassign
+                          {t('ticketView.reassign')}
                         </Button>
                       </Dropdown>
                     )}
                   </Space>
                 ) : (
                   <Space>
-                    <Text type="secondary">Unassigned</Text>
+                    <Text type="secondary">{t('tickets.unassigned')}</Text>
                     {canManage && (
                       <Dropdown
                         menu={{
@@ -464,7 +467,7 @@ const TicketView: React.FC = () => {
                         trigger={['click']}
                       >
                         <Button type="link" size="small">
-                          Assign
+                          {t('ticketView.assign')}
                         </Button>
                       </Dropdown>
                     )}
@@ -477,7 +480,7 @@ const TicketView: React.FC = () => {
             {ticket.attachments && ticket.attachments.length > 0 && (
               <>
                 <Divider orientation="left">
-                  <PaperClipOutlined /> Attachments ({ticket.attachments.length})
+                  <PaperClipOutlined /> {t('tickets.attachments')} ({ticket.attachments.length})
                 </Divider>
                 <List
                   size="small"
@@ -491,7 +494,7 @@ const TicketView: React.FC = () => {
                           icon={<DownloadOutlined />}
                           onClick={() => handleDownload(attachment)}
                         >
-                          Download
+                          {t('common.download')}
                         </Button>,
                       ]}
                     >
@@ -508,7 +511,7 @@ const TicketView: React.FC = () => {
           </Card>
 
           {/* Status Timeline */}
-          <Card title="Status History" style={{ marginBottom: 16 }}>
+          <Card title={t('ticketView.statusHistory')} style={{ marginBottom: 16 }}>
             {statusHistory.length > 0 ? (
               <Timeline
                 items={statusHistory.map((history) => ({
@@ -531,12 +534,12 @@ const TicketView: React.FC = () => {
                 }))}
               />
             ) : (
-              <Empty description="No status history" />
+              <Empty description={t('ticketView.noStatusHistory')} />
             )}
           </Card>
 
           {/* Comments Section */}
-          <Card title={`Comments (${ticket.comments?.length || 0})`}>
+          <Card title={`${t('ticketView.comments')} (${ticket.comments?.length || 0})`}>
             {/* Comment List */}
             {ticket.comments && ticket.comments.length > 0 ? (
               <List
@@ -600,11 +603,11 @@ const TicketView: React.FC = () => {
                             <Text strong>{comment.user?.name}</Text>
                             {comment.is_internal && (
                               <Tag color="orange" icon={<LockOutlined />}>
-                                Internal Note
+                                {t('ticketView.internalNote')}
                               </Tag>
                             )}
                             {isAgentComment && !comment.is_internal && (
-                              <Tag color="green">Support</Tag>
+                              <Tag color="green">{t('ticketView.support')}</Tag>
                             )}
                             <Text type="secondary" style={{ fontSize: 12 }}>
                               {dayjs(comment.created_at).fromNow()}
@@ -625,7 +628,7 @@ const TicketView: React.FC = () => {
                                   type="primary"
                                   onClick={() => handleEditComment(comment.id)}
                                 >
-                                  Save
+                                  {t('common.save')}
                                 </Button>
                                 <Button
                                   size="small"
@@ -634,7 +637,7 @@ const TicketView: React.FC = () => {
                                     setEditCommentText('');
                                   }}
                                 >
-                                  Cancel
+                                  {t('common.cancel')}
                                 </Button>
                               </Space>
                             </Space>
@@ -667,7 +670,7 @@ const TicketView: React.FC = () => {
                 }}
               />
             ) : (
-              <Empty description="No comments yet" />
+              <Empty description={t('ticketView.noComments')} />
             )}
 
             {/* Add Comment Form */}
@@ -684,7 +687,7 @@ const TicketView: React.FC = () => {
                 <Col>
                   <Space>
                     <Upload {...commentUploadProps}>
-                      <Button icon={<PaperClipOutlined />}>Attach Files</Button>
+                      <Button icon={<PaperClipOutlined />}>{t('ticketView.attachFiles')}</Button>
                     </Upload>
                     {canManage && (
                       <Space>
@@ -694,7 +697,7 @@ const TicketView: React.FC = () => {
                           size="small"
                         />
                         <Text type="secondary">
-                          <LockOutlined /> Internal Note
+                          <LockOutlined /> {t('ticketView.internalNote')}
                         </Text>
                       </Space>
                     )}
@@ -707,7 +710,7 @@ const TicketView: React.FC = () => {
                     onClick={handleAddComment}
                     loading={commentLoading}
                   >
-                    Send
+                    {t('ticketView.send')}
                   </Button>
                 </Col>
               </Row>
@@ -736,9 +739,9 @@ const TicketView: React.FC = () => {
         <Col xs={24} lg={8}>
           {/* Quick Status Change */}
           {canManage && (
-            <Card title="Quick Actions" style={{ marginBottom: 16 }}>
+            <Card title={t('ticketView.quickActions')} style={{ marginBottom: 16 }}>
               <Space direction="vertical" style={{ width: '100%' }}>
-                <Text strong>Change Status</Text>
+                <Text strong>{t('ticketView.changeStatus')}</Text>
                 <Space wrap>
                   {Object.entries(statusLabels).map(([value, label]) => (
                     <Button
@@ -777,7 +780,7 @@ const TicketView: React.FC = () => {
 
           {/* Response Templates */}
           {canManage && templates.length > 0 && (
-            <Card title="Response Templates" style={{ marginBottom: 16 }}>
+            <Card title={t('ticketView.responseTemplates')} style={{ marginBottom: 16 }}>
               <List
                 size="small"
                 dataSource={templates}
@@ -791,7 +794,7 @@ const TicketView: React.FC = () => {
                         icon={<PlusOutlined />}
                         onClick={() => handleInsertTemplate(template)}
                       >
-                        Insert
+                        {t('templates.insert')}
                       </Button>,
                     ]}
                   >
@@ -803,34 +806,34 @@ const TicketView: React.FC = () => {
           )}
 
           {/* Ticket Info Summary */}
-          <Card title="Ticket Information">
+          <Card title={t('ticketView.ticketInfo')}>
             <Descriptions column={1} size="small">
-              <Descriptions.Item label="Ticket ID">
+              <Descriptions.Item label={t('tickets.ticketId')}>
                 {ticket.ticket_number}
               </Descriptions.Item>
-              <Descriptions.Item label="Status">
+              <Descriptions.Item label={t('tickets.status')}>
                 <Tag color={statusColors[ticket.status]}>
                   {statusLabels[ticket.status]}
                 </Tag>
               </Descriptions.Item>
-              <Descriptions.Item label="Priority">
+              <Descriptions.Item label={t('tickets.priority')}>
                 <Tag color={priorityColors[ticket.priority]}>
                   {priorityLabels[ticket.priority]}
                 </Tag>
               </Descriptions.Item>
-              <Descriptions.Item label="Category">
+              <Descriptions.Item label={t('tickets.category')}>
                 {ticket.category?.name || '-'}
               </Descriptions.Item>
-              <Descriptions.Item label="Created">
+              <Descriptions.Item label={t('tickets.created')}>
                 {dayjs(ticket.created_at).format('MMM DD, YYYY HH:mm')}
               </Descriptions.Item>
               {ticket.resolved_at && (
-                <Descriptions.Item label="Resolved">
+                <Descriptions.Item label={t('tickets.resolved')}>
                   {dayjs(ticket.resolved_at).format('MMM DD, YYYY HH:mm')}
                 </Descriptions.Item>
               )}
               {ticket.closed_at && (
-                <Descriptions.Item label="Closed">
+                <Descriptions.Item label={t('tickets.closed')}>
                   {dayjs(ticket.closed_at).format('MMM DD, YYYY HH:mm')}
                 </Descriptions.Item>
               )}

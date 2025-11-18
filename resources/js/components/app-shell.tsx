@@ -8,7 +8,9 @@ interface AppShellProps {
 }
 
 export function AppShell({ children, variant = 'header' }: AppShellProps) {
-    const isOpen = usePage<SharedData>().props.sidebarOpen;
+    // Get sidebar state from Inertia page props
+    const page = usePage<SharedData>();
+    const isOpen = page.props?.sidebarOpen ?? true;
 
     if (variant === 'header') {
         return (

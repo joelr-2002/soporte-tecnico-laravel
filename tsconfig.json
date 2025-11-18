@@ -113,5 +113,13 @@
         },
         "jsx": "react-jsx"
     },
-    "include": ["resources/js/**/*.ts", "resources/js/**/*.d.ts", "resources/js/**/*.tsx"]
+    "include": ["resources/js/**/*.ts", "resources/js/**/*.d.ts", "resources/js/**/*.tsx"],
+    "exclude": [
+        "resources/js/pages/auth/Login.tsx",
+        "resources/js/pages/auth/Register.tsx",
+        "resources/js/pages/auth/ForgotPassword.tsx",
+        "resources/js/pages/auth/ResetPassword.tsx",
+        "resources/js/pages/Dashboard.tsx",
+        "resources/js/app.tsx"
+    ]
 }

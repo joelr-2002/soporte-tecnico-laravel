@@ -31,6 +31,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Trust proxies for proper URL generation behind load balancers
         $middleware->trustProxies(at: '*');
+
+        // Redirect guests to /auth/login instead of /login
+        $middleware->redirectGuestsTo('/auth/login');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
