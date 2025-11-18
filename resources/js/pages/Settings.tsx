@@ -26,86 +26,14 @@ import {
   KeyOutlined,
 } from '@ant-design/icons';
 import { useSettingsStore, Theme, Language, FontSize } from '../stores/settingsStore';
+import { useTranslation } from '@/i18n';
 
 const { Title, Text, Paragraph } = Typography;
 const { TabPane } = Tabs;
 
-// Translation strings
-const translations = {
-  es: {
-    settings: 'Configuracion',
-    appearance: 'Apariencia',
-    language: 'Idioma',
-    accessibility: 'Accesibilidad',
-    account: 'Cuenta',
-    theme: 'Tema',
-    themeDescription: 'Selecciona el tema de la aplicacion',
-    light: 'Claro',
-    dark: 'Oscuro',
-    system: 'Sistema',
-    preview: 'Vista previa',
-    currentTheme: 'Tema actual',
-    selectLanguage: 'Seleccionar idioma',
-    languageDescription: 'Elige el idioma de la interfaz',
-    spanish: 'Espanol',
-    english: 'Ingles',
-    previewText: 'Este es un texto de ejemplo en el idioma seleccionado.',
-    fontSize: 'Tamano de fuente',
-    fontSizeDescription: 'Ajusta el tamano del texto en la aplicacion',
-    small: 'Pequeno',
-    medium: 'Mediano',
-    large: 'Grande',
-    xlarge: 'Extra Grande',
-    highContrast: 'Alto contraste',
-    highContrastDescription: 'Aumenta el contraste de colores para mejor visibilidad',
-    reducedMotion: 'Reducir movimiento',
-    reducedMotionDescription: 'Desactiva animaciones y transiciones',
-    accessibilityPreview: 'Vista previa de accesibilidad',
-    viewProfile: 'Ver perfil',
-    changePassword: 'Cambiar contrasena',
-    accountDescription: 'Gestiona tu informacion personal y seguridad',
-    enabled: 'Activado',
-    disabled: 'Desactivado',
-  },
-  en: {
-    settings: 'Settings',
-    appearance: 'Appearance',
-    language: 'Language',
-    accessibility: 'Accessibility',
-    account: 'Account',
-    theme: 'Theme',
-    themeDescription: 'Select the application theme',
-    light: 'Light',
-    dark: 'Dark',
-    system: 'System',
-    preview: 'Preview',
-    currentTheme: 'Current theme',
-    selectLanguage: 'Select language',
-    languageDescription: 'Choose the interface language',
-    spanish: 'Spanish',
-    english: 'English',
-    previewText: 'This is a sample text in the selected language.',
-    fontSize: 'Font size',
-    fontSizeDescription: 'Adjust the text size in the application',
-    small: 'Small',
-    medium: 'Medium',
-    large: 'Large',
-    xlarge: 'Extra Large',
-    highContrast: 'High contrast',
-    highContrastDescription: 'Increase color contrast for better visibility',
-    reducedMotion: 'Reduce motion',
-    reducedMotionDescription: 'Disable animations and transitions',
-    accessibilityPreview: 'Accessibility preview',
-    viewProfile: 'View profile',
-    changePassword: 'Change password',
-    accountDescription: 'Manage your personal information and security',
-    enabled: 'Enabled',
-    disabled: 'Disabled',
-  },
-};
-
 const Settings: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const {
     theme,
     language,
@@ -120,8 +48,6 @@ const Settings: React.FC = () => {
     setReducedMotion,
   } = useSettingsStore();
 
-  const t = translations[language];
-
   const fontSizeMap: Record<FontSize, number> = {
     small: 12,
     medium: 14,
@@ -130,18 +56,18 @@ const Settings: React.FC = () => {
   };
 
   const fontSizeLabels: Record<FontSize, string> = {
-    small: t.small,
-    medium: t.medium,
-    large: t.large,
-    xlarge: t.xlarge,
+    small: t('userSettings.small'),
+    medium: t('userSettings.medium'),
+    large: t('userSettings.large'),
+    xlarge: t('userSettings.extraLarge'),
   };
 
   // Appearance Tab
   const AppearanceTab = () => (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
       <div>
-        <Title level={5}>{t.theme}</Title>
-        <Text type="secondary">{t.themeDescription}</Text>
+        <Title level={5}>{t('userSettings.theme')}</Title>
+        <Text type="secondary">{t('userSettings.selectTheme')}</Text>
         <div style={{ marginTop: 16 }}>
           <Radio.Group
             value={theme}
@@ -151,15 +77,15 @@ const Settings: React.FC = () => {
           >
             <Radio.Button value="light">
               <SunOutlined style={{ marginRight: 8 }} />
-              {t.light}
+              {t('userSettings.light')}
             </Radio.Button>
             <Radio.Button value="dark">
               <MoonOutlined style={{ marginRight: 8 }} />
-              {t.dark}
+              {t('userSettings.dark')}
             </Radio.Button>
             <Radio.Button value="system">
               <DesktopOutlined style={{ marginRight: 8 }} />
-              {t.system}
+              {t('userSettings.system')}
             </Radio.Button>
           </Radio.Group>
         </div>
@@ -168,7 +94,7 @@ const Settings: React.FC = () => {
       <Divider />
 
       <div>
-        <Title level={5}>{t.preview}</Title>
+        <Title level={5}>{t('userSettings.textPreview')}</Title>
         <Card
           style={{
             background: effectiveTheme === 'dark' ? '#141414' : '#ffffff',
@@ -181,7 +107,7 @@ const Settings: React.FC = () => {
                 color: effectiveTheme === 'dark' ? '#ffffff' : '#000000',
               }}
             >
-              {t.currentTheme}: {effectiveTheme === 'dark' ? t.dark : t.light}
+              {t('userSettings.theme')}: {effectiveTheme === 'dark' ? t('userSettings.dark') : t('userSettings.light')}
             </Text>
             <div
               style={{
@@ -196,7 +122,7 @@ const Settings: React.FC = () => {
                   color: effectiveTheme === 'dark' ? '#8c8c8c' : '#8c8c8c',
                 }}
               >
-                {t.previewText}
+                {t('userSettings.previewText')}
               </Text>
             </div>
           </Space>
@@ -209,16 +135,16 @@ const Settings: React.FC = () => {
   const LanguageTab = () => (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
       <div>
-        <Title level={5}>{t.selectLanguage}</Title>
-        <Text type="secondary">{t.languageDescription}</Text>
+        <Title level={5}>{t('userSettings.selectLanguage')}</Title>
+        <Text type="secondary">{t('userSettings.language')}</Text>
         <div style={{ marginTop: 16 }}>
           <Select
             value={language}
             onChange={(value: Language) => setLanguage(value)}
             style={{ width: 200 }}
             options={[
-              { value: 'es', label: t.spanish },
-              { value: 'en', label: t.english },
+              { value: 'es', label: t('userSettings.spanish') },
+              { value: 'en', label: t('userSettings.english') },
             ]}
           />
         </div>
@@ -227,10 +153,10 @@ const Settings: React.FC = () => {
       <Divider />
 
       <div>
-        <Title level={5}>{t.preview}</Title>
+        <Title level={5}>{t('userSettings.textPreview')}</Title>
         <Alert
           message={language === 'es' ? 'Espanol seleccionado' : 'English selected'}
-          description={t.previewText}
+          description={t('userSettings.previewText')}
           type="info"
           showIcon
         />
@@ -244,9 +170,9 @@ const Settings: React.FC = () => {
       <div>
         <Title level={5}>
           <FontSizeOutlined style={{ marginRight: 8 }} />
-          {t.fontSize}
+          {t('userSettings.fontSize')}
         </Title>
-        <Text type="secondary">{t.fontSizeDescription}</Text>
+        <Text type="secondary">{t('userSettings.fontSize')}</Text>
         <div style={{ marginTop: 16 }}>
           <Radio.Group
             value={fontSize}
@@ -254,10 +180,10 @@ const Settings: React.FC = () => {
             optionType="button"
             buttonStyle="solid"
           >
-            <Radio.Button value="small">{t.small}</Radio.Button>
-            <Radio.Button value="medium">{t.medium}</Radio.Button>
-            <Radio.Button value="large">{t.large}</Radio.Button>
-            <Radio.Button value="xlarge">{t.xlarge}</Radio.Button>
+            <Radio.Button value="small">{t('userSettings.small')}</Radio.Button>
+            <Radio.Button value="medium">{t('userSettings.medium')}</Radio.Button>
+            <Radio.Button value="large">{t('userSettings.large')}</Radio.Button>
+            <Radio.Button value="xlarge">{t('userSettings.extraLarge')}</Radio.Button>
           </Radio.Group>
         </div>
       </div>
@@ -270,9 +196,9 @@ const Settings: React.FC = () => {
             <Space direction="vertical" style={{ width: '100%' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <Title level={5} style={{ margin: 0 }}>{t.highContrast}</Title>
+                  <Title level={5} style={{ margin: 0 }}>{t('userSettings.highContrast')}</Title>
                   <Text type="secondary" style={{ fontSize: 12 }}>
-                    {t.highContrastDescription}
+                    {t('userSettings.highContrastDesc')}
                   </Text>
                 </div>
                 <Switch
@@ -288,9 +214,9 @@ const Settings: React.FC = () => {
             <Space direction="vertical" style={{ width: '100%' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <Title level={5} style={{ margin: 0 }}>{t.reducedMotion}</Title>
+                  <Title level={5} style={{ margin: 0 }}>{t('userSettings.reducedMotion')}</Title>
                   <Text type="secondary" style={{ fontSize: 12 }}>
-                    {t.reducedMotionDescription}
+                    {t('userSettings.reducedMotionDesc')}
                   </Text>
                 </div>
                 <Switch
@@ -306,7 +232,7 @@ const Settings: React.FC = () => {
       <Divider />
 
       <div>
-        <Title level={5}>{t.accessibilityPreview}</Title>
+        <Title level={5}>{t('userSettings.textPreview')}</Title>
         <Card
           style={{
             filter: highContrast ? 'contrast(1.25)' : 'none',
@@ -319,20 +245,20 @@ const Settings: React.FC = () => {
               marginBottom: 8,
             }}
           >
-            {t.previewText}
+            {t('userSettings.previewText')}
           </Paragraph>
           <Space>
             <Text style={{ fontSize: fontSizeMap[fontSize] }}>
-              {t.fontSize}: {fontSizeLabels[fontSize]} ({fontSizeMap[fontSize]}px)
+              {t('userSettings.fontSize')}: {fontSizeLabels[fontSize]} ({fontSizeMap[fontSize]}px)
             </Text>
           </Space>
           <br />
           <Space style={{ marginTop: 8 }}>
             <Text type="secondary" style={{ fontSize: fontSizeMap[fontSize] - 2 }}>
-              {t.highContrast}: {highContrast ? t.enabled : t.disabled}
+              {t('userSettings.highContrast')}: {highContrast ? t('common.enabled') : t('common.disabled')}
             </Text>
             <Text type="secondary" style={{ fontSize: fontSizeMap[fontSize] - 2 }}>
-              | {t.reducedMotion}: {reducedMotion ? t.enabled : t.disabled}
+              | {t('userSettings.reducedMotion')}: {reducedMotion ? t('common.enabled') : t('common.disabled')}
             </Text>
           </Space>
         </Card>
@@ -344,8 +270,8 @@ const Settings: React.FC = () => {
   const AccountTab = () => (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
       <div>
-        <Title level={5}>{t.account}</Title>
-        <Text type="secondary">{t.accountDescription}</Text>
+        <Title level={5}>{t('userSettings.account')}</Title>
+        <Text type="secondary">{t('userSettings.account')}</Text>
       </div>
 
       <Divider />
@@ -358,7 +284,7 @@ const Settings: React.FC = () => {
           block
           onClick={() => navigate('/profile')}
         >
-          {t.viewProfile}
+          {t('common.viewProfile')}
         </Button>
         <Button
           icon={<KeyOutlined />}
@@ -366,7 +292,7 @@ const Settings: React.FC = () => {
           block
           onClick={() => navigate('/profile')}
         >
-          {t.changePassword}
+          {t('common.changePassword')}
         </Button>
       </Space>
     </Space>
@@ -374,7 +300,7 @@ const Settings: React.FC = () => {
 
   return (
     <div style={{ padding: '24px', maxWidth: 800, margin: '0 auto' }}>
-      <Title level={2}>{t.settings}</Title>
+      <Title level={2}>{t('userSettings.title')}</Title>
       <Card>
         <Tabs
           defaultActiveKey="appearance"
@@ -385,7 +311,7 @@ const Settings: React.FC = () => {
               label: (
                 <span>
                   <BgColorsOutlined />
-                  {t.appearance}
+                  {t('userSettings.appearance')}
                 </span>
               ),
               children: <AppearanceTab />,
@@ -395,7 +321,7 @@ const Settings: React.FC = () => {
               label: (
                 <span>
                   <GlobalOutlined />
-                  {t.language}
+                  {t('userSettings.language')}
                 </span>
               ),
               children: <LanguageTab />,
@@ -405,7 +331,7 @@ const Settings: React.FC = () => {
               label: (
                 <span>
                   <EyeOutlined />
-                  {t.accessibility}
+                  {t('userSettings.accessibility')}
                 </span>
               ),
               children: <AccessibilityTab />,
@@ -415,7 +341,7 @@ const Settings: React.FC = () => {
               label: (
                 <span>
                   <UserOutlined />
-                  {t.account}
+                  {t('userSettings.account')}
                 </span>
               ),
               children: <AccountTab />,

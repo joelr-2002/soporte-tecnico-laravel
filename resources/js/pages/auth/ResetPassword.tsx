@@ -5,6 +5,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { getErrorMessage } from '../../services/api';
 import { ResetPasswordData } from '../../types';
+import { useTranslation } from '../../i18n';
 
 const { Title, Text } = Typography;
 
@@ -13,6 +14,7 @@ const ResetPassword: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { resetPassword, isLoading } = useAuthStore();
+  const { t } = useTranslation();
 
   // Get token and email from URL parameters
   const token = searchParams.get('token') || '';
@@ -26,7 +28,7 @@ const ResetPassword: React.FC = () => {
         password: values.password,
         password_confirmation: values.password_confirmation,
       });
-      message.success('Password reset successfully! Please login with your new password.');
+      message.success(t('auth.passwordResetSent'));
       navigate('/auth/login');
     } catch (error) {
       message.error(getErrorMessage(error));
@@ -37,10 +39,10 @@ const ResetPassword: React.FC = () => {
     <div style={{ width: '100%', maxWidth: 400 }}>
       <div style={{ textAlign: 'center', marginBottom: 32 }}>
         <Title level={2} style={{ marginBottom: 8 }}>
-          Reset Password
+          {t('authPages.resetPasswordTitle')}
         </Title>
         <Text type="secondary">
-          Enter your new password below
+          {t('authPages.resetPasswordSubtitle')}
         </Text>
       </div>
 
@@ -56,26 +58,26 @@ const ResetPassword: React.FC = () => {
         <Form.Item
           name="email"
           rules={[
-            { required: true, message: 'Please enter your email' },
-            { type: 'email', message: 'Please enter a valid email' }
+            { required: true, message: t('validation.emailRequired') },
+            { type: 'email', message: t('validation.emailInvalid') }
           ]}
         >
           <Input
             prefix={<MailOutlined />}
-            placeholder="Email address"
+            placeholder={t('authPages.emailLabel')}
           />
         </Form.Item>
 
         <Form.Item
           name="password"
           rules={[
-            { required: true, message: 'Please enter a new password' },
-            { min: 8, message: 'Password must be at least 8 characters' }
+            { required: true, message: t('validation.passwordRequired') },
+            { min: 8, message: t('validation.passwordMin', { min: 8 }) }
           ]}
         >
           <Input.Password
             prefix={<LockOutlined />}
-            placeholder="New password"
+            placeholder={t('auth.newPassword')}
           />
         </Form.Item>
 
@@ -83,20 +85,20 @@ const ResetPassword: React.FC = () => {
           name="password_confirmation"
           dependencies={['password']}
           rules={[
-            { required: true, message: 'Please confirm your password' },
+            { required: true, message: t('validation.required') },
             ({ getFieldValue }) => ({
               validator(_, value) {
                 if (!value || getFieldValue('password') === value) {
                   return Promise.resolve();
                 }
-                return Promise.reject(new Error('Passwords do not match'));
+                return Promise.reject(new Error(t('errors.passwordMismatch')));
               },
             }),
           ]}
         >
           <Input.Password
             prefix={<LockOutlined />}
-            placeholder="Confirm new password"
+            placeholder={t('authPages.confirmPasswordLabel')}
           />
         </Form.Item>
 
@@ -107,7 +109,7 @@ const ResetPassword: React.FC = () => {
             block
             loading={isLoading}
           >
-            Reset Password
+            {t('authPages.resetPasswordButton')}
           </Button>
         </Form.Item>
       </Form>

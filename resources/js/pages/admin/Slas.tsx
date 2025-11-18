@@ -126,7 +126,7 @@ const Slas: React.FC = () => {
     setSubmitting(true);
     try {
       await slaService.createSla(values);
-      message.success('SLA created successfully');
+      message.success(t('sla.createdSuccessfully'));
       setCreateModalVisible(false);
       createForm.resetFields();
       fetchSlas();
@@ -144,7 +144,7 @@ const Slas: React.FC = () => {
     setSubmitting(true);
     try {
       await slaService.updateSla(editingSla.id, values);
-      message.success('SLA updated successfully');
+      message.success(t('sla.updatedSuccessfully'));
       setEditModalVisible(false);
       setEditingSla(null);
       editForm.resetFields();
@@ -160,7 +160,7 @@ const Slas: React.FC = () => {
   const handleDelete = async (id: number) => {
     try {
       await slaService.deleteSla(id);
-      message.success('SLA deleted successfully');
+      message.success(t('sla.deletedSuccessfully'));
       fetchSlas();
     } catch (error) {
       message.error(error instanceof Error ? error.message : 'Failed to delete SLA');
@@ -195,25 +195,25 @@ const Slas: React.FC = () => {
   // Table columns for SLAs
   const columns: ColumnsType<Sla> = [
     {
-      title: 'Name',
+      title: t('sla.name'),
       dataIndex: 'name',
       key: 'name',
       render: (text) => <Text strong>{text}</Text>,
     },
     {
-      title: 'Priority',
+      title: t('sla.priority'),
       dataIndex: 'priority',
       key: 'priority',
       width: 100,
       align: 'center',
       render: (priority: string) => (
         <Tag color={getPriorityColor(priority)}>
-          {priority.toUpperCase()}
+          {t(`priority.${priority}`)}
         </Tag>
       ),
     },
     {
-      title: 'Response Time',
+      title: t('sla.responseTime'),
       dataIndex: 'formatted_response_time',
       key: 'response_time',
       width: 130,
@@ -226,7 +226,7 @@ const Slas: React.FC = () => {
       ),
     },
     {
-      title: 'Resolution Time',
+      title: t('sla.resolutionTime'),
       dataIndex: 'formatted_resolution_time',
       key: 'resolution_time',
       width: 140,
@@ -239,19 +239,19 @@ const Slas: React.FC = () => {
       ),
     },
     {
-      title: 'Status',
+      title: t('sla.status'),
       dataIndex: 'is_active',
       key: 'is_active',
       width: 100,
       align: 'center',
       render: (isActive: boolean) => (
         <Tag color={isActive ? 'green' : 'default'}>
-          {isActive ? 'Active' : 'Inactive'}
+          {isActive ? t('sla.active') : t('sla.inactive')}
         </Tag>
       ),
     },
     {
-      title: 'Tickets',
+      title: t('sla.tickets'),
       dataIndex: 'tickets_count',
       key: 'tickets_count',
       width: 100,
@@ -261,27 +261,27 @@ const Slas: React.FC = () => {
       ),
     },
     {
-      title: 'Actions',
+      title: t('common.actions'),
       key: 'actions',
       width: 120,
       align: 'center',
       render: (_, record) => (
         <Space>
-          <Tooltip title="Edit">
+          <Tooltip title={t('common.edit')}>
             <Button
               type="text"
               icon={<EditOutlined />}
               onClick={() => openEditModal(record)}
             />
           </Tooltip>
-          <Tooltip title={(record.tickets_count || 0) > 0 ? 'Cannot delete: has tickets' : 'Delete'}>
+          <Tooltip title={(record.tickets_count || 0) > 0 ? 'Cannot delete: has tickets' : t('common.delete')}>
             <Popconfirm
-              title="Delete SLA"
-              description="Are you sure you want to delete this SLA?"
+              title={t('sla.deleteSla')}
+              description={t('sla.confirmDelete')}
               onConfirm={() => handleDelete(record.id)}
-              okText="Delete"
+              okText={t('common.delete')}
               okType="danger"
-              cancelText="Cancel"
+              cancelText={t('common.cancel')}
               disabled={(record.tickets_count || 0) > 0}
             >
               <Button
@@ -311,13 +311,13 @@ const Slas: React.FC = () => {
     >
       <Form.Item
         name="name"
-        label="Name"
+        label={t('sla.name')}
         rules={[
-          { required: true, message: 'Please enter SLA name' },
-          { max: 255, message: 'Name cannot exceed 255 characters' },
+          { required: true, message: t('sla.enterSlaName') },
+          { max: 255, message: t('sla.nameMaxLength') },
         ]}
       >
-        <Input placeholder="Enter SLA name" />
+        <Input placeholder={t('sla.enterSlaName')} />
       </Form.Item>
 
       <Form.Item
@@ -332,14 +332,14 @@ const Slas: React.FC = () => {
 
       <Form.Item
         name="priority"
-        label="Priority"
-        rules={[{ required: true, message: 'Please select priority' }]}
+        label={t('sla.priority')}
+        rules={[{ required: true, message: t('sla.selectPriority') }]}
       >
-        <Select placeholder="Select priority">
-          <Select.Option value="low">Low</Select.Option>
-          <Select.Option value="medium">Medium</Select.Option>
-          <Select.Option value="high">High</Select.Option>
-          <Select.Option value="urgent">Urgent</Select.Option>
+        <Select placeholder={t('sla.selectPriority')}>
+          <Select.Option value="low">{t('priority.low')}</Select.Option>
+          <Select.Option value="medium">{t('priority.medium')}</Select.Option>
+          <Select.Option value="high">{t('priority.high')}</Select.Option>
+          <Select.Option value="urgent">{t('priority.urgent')}</Select.Option>
         </Select>
       </Form.Item>
 
@@ -347,10 +347,10 @@ const Slas: React.FC = () => {
         <Col span={12}>
           <Form.Item
             name="response_time"
-            label="Response Time (minutes)"
+            label={t('sla.responseTimeMinutes')}
             rules={[
-              { required: true, message: 'Please enter response time' },
-              { type: 'number', min: 1, message: 'Must be at least 1 minute' },
+              { required: true, message: t('sla.enterResponseTime') },
+              { type: 'number', min: 1, message: t('sla.minOneMinute') },
             ]}
           >
             <InputNumber
@@ -363,10 +363,10 @@ const Slas: React.FC = () => {
         <Col span={12}>
           <Form.Item
             name="resolution_time"
-            label="Resolution Time (minutes)"
+            label={t('sla.resolutionTimeMinutes')}
             rules={[
-              { required: true, message: 'Please enter resolution time' },
-              { type: 'number', min: 1, message: 'Must be at least 1 minute' },
+              { required: true, message: t('sla.enterResolutionTime') },
+              { type: 'number', min: 1, message: t('sla.minOneMinute') },
             ]}
           >
             <InputNumber
@@ -380,10 +380,10 @@ const Slas: React.FC = () => {
 
       <Form.Item
         name="is_active"
-        label="Active"
+        label={t('sla.status')}
         valuePropName="checked"
       >
-        <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
+        <Switch checkedChildren={t('sla.active')} unCheckedChildren={t('sla.inactive')} />
       </Form.Item>
 
       <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
@@ -393,10 +393,10 @@ const Slas: React.FC = () => {
             setCreateModalVisible(false);
             setEditModalVisible(false);
           }}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button type="primary" htmlType="submit" loading={submitting}>
-            {editingSla ? 'Update' : 'Create'}
+            {editingSla ? t('sla.update') : t('common.create')}
           </Button>
         </Space>
       </Form.Item>
@@ -411,7 +411,7 @@ const Slas: React.FC = () => {
         <Col xs={24} sm={12} md={6}>
           <Card>
             <Statistic
-              title="Total Tickets with SLA"
+              title={t('sla.totalTicketsWithSla')}
               value={complianceStats?.total_tickets_with_sla || 0}
               prefix={<ClockCircleOutlined />}
             />
@@ -420,7 +420,7 @@ const Slas: React.FC = () => {
         <Col xs={24} sm={12} md={6}>
           <Card>
             <Statistic
-              title="Response Compliance"
+              title={t('sla.responseCompliance')}
               value={complianceStats?.response.compliance_rate || 100}
               suffix="%"
               prefix={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
@@ -431,7 +431,7 @@ const Slas: React.FC = () => {
         <Col xs={24} sm={12} md={6}>
           <Card>
             <Statistic
-              title="Resolution Compliance"
+              title={t('sla.resolutionCompliance')}
               value={complianceStats?.resolution.compliance_rate || 100}
               suffix="%"
               prefix={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
@@ -442,7 +442,7 @@ const Slas: React.FC = () => {
         <Col xs={24} sm={12} md={6}>
           <Card>
             <Statistic
-              title="At Risk"
+              title={t('sla.atRisk')}
               value={(complianceStats?.response.at_risk || 0) + (complianceStats?.resolution.at_risk || 0)}
               prefix={<WarningOutlined style={{ color: '#faad14' }} />}
               valueStyle={{ color: '#faad14' }}
@@ -454,7 +454,7 @@ const Slas: React.FC = () => {
       {/* Compliance Progress */}
       <Row gutter={16} style={{ marginBottom: 24 }}>
         <Col xs={24} md={12}>
-          <Card title="Response Time Compliance">
+          <Card title={t('sla.responseTimeCompliance')}>
             <Progress
               percent={complianceStats?.response.compliance_rate || 100}
               status={(complianceStats?.response.compliance_rate || 100) >= 90 ? 'success' : 'exception'}
@@ -463,21 +463,21 @@ const Slas: React.FC = () => {
             <Row gutter={16} style={{ marginTop: 16 }}>
               <Col span={8}>
                 <Statistic
-                  title="Compliant"
+                  title={t('sla.compliant')}
                   value={complianceStats?.response.compliant || 0}
                   valueStyle={{ color: '#52c41a', fontSize: 16 }}
                 />
               </Col>
               <Col span={8}>
                 <Statistic
-                  title="Breached"
+                  title={t('sla.breached')}
                   value={complianceStats?.response.breached || 0}
                   valueStyle={{ color: '#ff4d4f', fontSize: 16 }}
                 />
               </Col>
               <Col span={8}>
                 <Statistic
-                  title="At Risk"
+                  title={t('sla.atRisk')}
                   value={complianceStats?.response.at_risk || 0}
                   valueStyle={{ color: '#faad14', fontSize: 16 }}
                 />
@@ -486,7 +486,7 @@ const Slas: React.FC = () => {
           </Card>
         </Col>
         <Col xs={24} md={12}>
-          <Card title="Resolution Time Compliance">
+          <Card title={t('sla.resolutionTimeCompliance')}>
             <Progress
               percent={complianceStats?.resolution.compliance_rate || 100}
               status={(complianceStats?.resolution.compliance_rate || 100) >= 90 ? 'success' : 'exception'}
@@ -495,21 +495,21 @@ const Slas: React.FC = () => {
             <Row gutter={16} style={{ marginTop: 16 }}>
               <Col span={8}>
                 <Statistic
-                  title="Compliant"
+                  title={t('sla.compliant')}
                   value={complianceStats?.resolution.compliant || 0}
                   valueStyle={{ color: '#52c41a', fontSize: 16 }}
                 />
               </Col>
               <Col span={8}>
                 <Statistic
-                  title="Breached"
+                  title={t('sla.breached')}
                   value={complianceStats?.resolution.breached || 0}
                   valueStyle={{ color: '#ff4d4f', fontSize: 16 }}
                 />
               </Col>
               <Col span={8}>
                 <Statistic
-                  title="At Risk"
+                  title={t('sla.atRisk')}
                   value={complianceStats?.resolution.at_risk || 0}
                   valueStyle={{ color: '#faad14', fontSize: 16 }}
                 />
@@ -524,7 +524,7 @@ const Slas: React.FC = () => {
         title={
           <span>
             <WarningOutlined style={{ color: '#faad14', marginRight: 8 }} />
-            At Risk Tickets
+            {t('sla.atRiskTickets')}
           </span>
         }
         style={{ marginBottom: 24 }}
@@ -545,7 +545,7 @@ const Slas: React.FC = () => {
                 <List.Item.Meta
                   title={
                     <span>
-                      <Tag color={getPriorityColor(ticket.priority)}>{ticket.priority}</Tag>
+                      <Tag color={getPriorityColor(ticket.priority)}>{t(`priority.${ticket.priority}`)}</Tag>
                       {ticket.ticket_number} - {ticket.title}
                     </span>
                   }
@@ -568,7 +568,7 @@ const Slas: React.FC = () => {
             )}
           />
         ) : (
-          <Text type="secondary">No tickets at risk</Text>
+          <Text type="secondary">{t('sla.noAtRiskTickets')}</Text>
         )}
       </Card>
 
@@ -577,7 +577,7 @@ const Slas: React.FC = () => {
         title={
           <span>
             <ExclamationCircleOutlined style={{ color: '#ff4d4f', marginRight: 8 }} />
-            Breached Tickets
+            {t('sla.breachedTickets')}
           </span>
         }
         extra={
@@ -597,7 +597,7 @@ const Slas: React.FC = () => {
                 <List.Item.Meta
                   title={
                     <span>
-                      <Tag color={getPriorityColor(ticket.priority)}>{ticket.priority}</Tag>
+                      <Tag color={getPriorityColor(ticket.priority)}>{t(`priority.${ticket.priority}`)}</Tag>
                       {ticket.ticket_number} - {ticket.title}
                     </span>
                   }
@@ -619,7 +619,7 @@ const Slas: React.FC = () => {
             )}
           />
         ) : (
-          <Text type="secondary">No breached tickets</Text>
+          <Text type="secondary">{t('sla.noBreachedTickets')}</Text>
         )}
       </Card>
     </div>
@@ -630,7 +630,7 @@ const Slas: React.FC = () => {
       <div style={{ marginBottom: 24 }}>
         <Row justify="space-between" align="middle">
           <Col>
-            <Title level={4} style={{ margin: 0 }}>SLA Management</Title>
+            <Title level={4} style={{ margin: 0 }}>{t('sla.title')}</Title>
           </Col>
           <Col>
             <Space>
@@ -643,7 +643,7 @@ const Slas: React.FC = () => {
                   fetchBreachedTickets();
                 }}
               >
-                Refresh
+                {t('common.refresh')}
               </Button>
               <Button
                 type="primary"
@@ -654,7 +654,7 @@ const Slas: React.FC = () => {
                   setCreateModalVisible(true);
                 }}
               >
-                New SLA
+                {t('sla.newSla')}
               </Button>
             </Space>
           </Col>
@@ -662,7 +662,7 @@ const Slas: React.FC = () => {
       </div>
 
       <Tabs activeKey={activeTab} onChange={setActiveTab}>
-        <TabPane tab="SLA Policies" key="slas">
+        <TabPane tab={t('sla.policies')} key="slas">
           <Card>
             <Table
               columns={columns}
@@ -673,14 +673,14 @@ const Slas: React.FC = () => {
             />
           </Card>
         </TabPane>
-        <TabPane tab="Compliance Dashboard" key="compliance">
+        <TabPane tab={t('sla.complianceDashboard')} key="compliance">
           <ComplianceDashboard />
         </TabPane>
       </Tabs>
 
       {/* Create Modal */}
       <Modal
-        title="Create SLA"
+        title={t('sla.createSla')}
         open={createModalVisible}
         onCancel={() => {
           setCreateModalVisible(false);
@@ -699,7 +699,7 @@ const Slas: React.FC = () => {
 
       {/* Edit Modal */}
       <Modal
-        title="Edit SLA"
+        title={t('sla.editSla')}
         open={editModalVisible}
         onCancel={() => {
           setEditModalVisible(false);

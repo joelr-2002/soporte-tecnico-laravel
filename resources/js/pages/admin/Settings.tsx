@@ -59,9 +59,9 @@ const Settings: React.FC = () => {
       <div style={{ marginBottom: 24 }}>
         <Title level={4} style={{ margin: 0 }}>
           <SettingOutlined style={{ marginRight: 8 }} />
-          System Settings
+          {t('adminSettings.title')}
         </Title>
-        <Text type="secondary">Configure system-wide settings for the support ticket system</Text>
+        <Text type="secondary">{t('adminSettings.description')}</Text>
       </div>
 
       <Tabs defaultActiveKey="general" tabPosition="left">
@@ -70,12 +70,12 @@ const Settings: React.FC = () => {
           tab={
             <span>
               <SettingOutlined />
-              General
+              {t('adminSettings.general')}
             </span>
           }
           key="general"
         >
-          <Card title="General Settings">
+          <Card title={t('adminSettings.generalSettings')}>
             <Form
               form={generalForm}
               layout="vertical"
@@ -94,20 +94,20 @@ const Settings: React.FC = () => {
                 <Col span={12}>
                   <Form.Item
                     name="site_name"
-                    label="Site Name"
+                    label={t('adminSettings.siteName')}
                     rules={[{ required: true }]}
                   >
-                    <Input placeholder="Enter site name" />
+                    <Input placeholder={t('adminSettings.enterSiteName')} />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
                   <Form.Item
                     name="default_language"
-                    label="Default Language"
+                    label={t('adminSettings.defaultLanguage')}
                   >
                     <Select>
-                      <Select.Option value="en">English</Select.Option>
-                      <Select.Option value="es">Spanish</Select.Option>
+                      <Select.Option value="en">{t('settings.english')}</Select.Option>
+                      <Select.Option value="es">{t('settings.spanish')}</Select.Option>
                     </Select>
                   </Form.Item>
                 </Col>
@@ -115,16 +115,16 @@ const Settings: React.FC = () => {
 
               <Form.Item
                 name="site_description"
-                label="Site Description"
+                label={t('adminSettings.siteDescription')}
               >
-                <TextArea rows={3} placeholder="Enter site description" />
+                <TextArea rows={3} placeholder={t('adminSettings.enterSiteDescription')} />
               </Form.Item>
 
               <Row gutter={16}>
                 <Col span={8}>
                   <Form.Item
                     name="timezone"
-                    label="Timezone"
+                    label={t('adminSettings.timezone')}
                   >
                     <Select>
                       <Select.Option value="UTC">UTC</Select.Option>
@@ -138,7 +138,7 @@ const Settings: React.FC = () => {
                 <Col span={8}>
                   <Form.Item
                     name="date_format"
-                    label="Date Format"
+                    label={t('adminSettings.dateFormat')}
                   >
                     <Select>
                       <Select.Option value="YYYY-MM-DD">YYYY-MM-DD</Select.Option>
@@ -159,7 +159,7 @@ const Settings: React.FC = () => {
 
               <Form.Item>
                 <Button type="primary" htmlType="submit" loading={loading}>
-                  Save General Settings
+                  {t('adminSettings.saveGeneralSettings')}
                 </Button>
               </Form.Item>
             </Form>
@@ -171,12 +171,12 @@ const Settings: React.FC = () => {
           tab={
             <span>
               <MailOutlined />
-              Email
+              {t('adminSettings.email')}
             </span>
           }
           key="email"
         >
-          <Card title="Email Configuration">
+          <Card title={t('adminSettings.emailConfiguration')}>
             <Form
               form={emailForm}
               layout="vertical"
@@ -193,7 +193,7 @@ const Settings: React.FC = () => {
                 <Col span={12}>
                   <Form.Item
                     name="mail_driver"
-                    label="Mail Driver"
+                    label={t('adminSettings.mailDriver')}
                   >
                     <Select>
                       <Select.Option value="smtp">SMTP</Select.Option>
@@ -206,7 +206,7 @@ const Settings: React.FC = () => {
                 <Col span={12}>
                   <Form.Item
                     name="mail_from_name"
-                    label="From Name"
+                    label={t('adminSettings.fromName')}
                   >
                     <Input placeholder="Support Team" />
                   </Form.Item>
@@ -217,7 +217,7 @@ const Settings: React.FC = () => {
                 <Col span={12}>
                   <Form.Item
                     name="mail_host"
-                    label="SMTP Host"
+                    label={t('adminSettings.smtpHost')}
                   >
                     <Input placeholder="smtp.example.com" />
                   </Form.Item>
@@ -225,7 +225,7 @@ const Settings: React.FC = () => {
                 <Col span={6}>
                   <Form.Item
                     name="mail_port"
-                    label="SMTP Port"
+                    label={t('adminSettings.smtpPort')}
                   >
                     <InputNumber style={{ width: '100%' }} />
                   </Form.Item>
@@ -233,7 +233,7 @@ const Settings: React.FC = () => {
                 <Col span={6}>
                   <Form.Item
                     name="mail_encryption"
-                    label="Encryption"
+                    label={t('adminSettings.mailEncryption')}
                   >
                     <Select>
                       <Select.Option value="tls">TLS</Select.Option>
@@ -248,7 +248,7 @@ const Settings: React.FC = () => {
                 <Col span={12}>
                   <Form.Item
                     name="mail_username"
-                    label="SMTP Username"
+                    label={t('adminSettings.smtpUsername')}
                   >
                     <Input placeholder="username" />
                   </Form.Item>
@@ -256,7 +256,7 @@ const Settings: React.FC = () => {
                 <Col span={12}>
                   <Form.Item
                     name="mail_password"
-                    label="SMTP Password"
+                    label={t('adminSettings.smtpPassword')}
                   >
                     <Input.Password placeholder="password" />
                   </Form.Item>
@@ -265,7 +265,7 @@ const Settings: React.FC = () => {
 
               <Form.Item
                 name="mail_from_address"
-                label="From Email Address"
+                label={t('adminSettings.fromAddress')}
               >
                 <Input placeholder="support@example.com" type="email" />
               </Form.Item>
@@ -273,9 +273,9 @@ const Settings: React.FC = () => {
               <Form.Item>
                 <Space>
                   <Button type="primary" htmlType="submit" loading={loading}>
-                    Save Email Settings
+                    {t('adminSettings.saveEmailSettings')}
                   </Button>
-                  <Button>Test Email Connection</Button>
+                  <Button>{t('adminSettings.testEmailConnection')}</Button>
                 </Space>
               </Form.Item>
             </Form>
@@ -287,12 +287,12 @@ const Settings: React.FC = () => {
           tab={
             <span>
               <BellOutlined />
-              Notifications
+              {t('adminSettings.notifications')}
             </span>
           }
           key="notifications"
         >
-          <Card title="Notification Settings">
+          <Card title={t('adminSettings.notificationSettings')}>
             <Form
               form={notificationForm}
               layout="vertical"
@@ -308,16 +308,16 @@ const Settings: React.FC = () => {
               }}
             >
               <Paragraph type="secondary">
-                Configure which events trigger email notifications
+                {t('adminSettings.configureNotifications')}
               </Paragraph>
               <Divider />
 
-              <Title level={5}>Ticket Notifications</Title>
+              <Title level={5}>{t('adminSettings.ticketNotifications')}</Title>
               <Row gutter={[16, 16]}>
                 <Col span={12}>
                   <Form.Item
                     name="notify_new_ticket"
-                    label="New Ticket Created"
+                    label={t('adminSettings.newTicketCreated')}
                     valuePropName="checked"
                   >
                     <Switch />
@@ -326,7 +326,7 @@ const Settings: React.FC = () => {
                 <Col span={12}>
                   <Form.Item
                     name="notify_ticket_assigned"
-                    label="Ticket Assigned"
+                    label={t('adminSettings.ticketAssigned')}
                     valuePropName="checked"
                   >
                     <Switch />
@@ -335,7 +335,7 @@ const Settings: React.FC = () => {
                 <Col span={12}>
                   <Form.Item
                     name="notify_ticket_updated"
-                    label="Ticket Updated"
+                    label={t('adminSettings.ticketStatusChanged')}
                     valuePropName="checked"
                   >
                     <Switch />
@@ -344,7 +344,7 @@ const Settings: React.FC = () => {
                 <Col span={12}>
                   <Form.Item
                     name="notify_ticket_resolved"
-                    label="Ticket Resolved"
+                    label={t('adminSettings.ticketResolved')}
                     valuePropName="checked"
                   >
                     <Switch />
@@ -353,7 +353,7 @@ const Settings: React.FC = () => {
                 <Col span={12}>
                   <Form.Item
                     name="notify_new_comment"
-                    label="New Comment"
+                    label={t('adminSettings.newCommentAdded')}
                     valuePropName="checked"
                   >
                     <Switch />
@@ -362,12 +362,12 @@ const Settings: React.FC = () => {
               </Row>
 
               <Divider />
-              <Title level={5}>SLA Notifications</Title>
+              <Title level={5}>{t('adminSettings.slaNotifications')}</Title>
               <Row gutter={[16, 16]}>
                 <Col span={12}>
                   <Form.Item
                     name="notify_sla_warning"
-                    label="SLA Warning (At Risk)"
+                    label={t('adminSettings.slaWarning')}
                     valuePropName="checked"
                   >
                     <Switch />
@@ -376,7 +376,7 @@ const Settings: React.FC = () => {
                 <Col span={12}>
                   <Form.Item
                     name="notify_sla_breach"
-                    label="SLA Breach"
+                    label={t('adminSettings.slaBreach')}
                     valuePropName="checked"
                   >
                     <Switch />
@@ -386,7 +386,7 @@ const Settings: React.FC = () => {
 
               <Form.Item>
                 <Button type="primary" htmlType="submit" loading={loading}>
-                  Save Notification Settings
+                  {t('adminSettings.saveNotificationSettings')}
                 </Button>
               </Form.Item>
             </Form>
@@ -398,12 +398,12 @@ const Settings: React.FC = () => {
           tab={
             <span>
               <SafetyOutlined />
-              Security
+              {t('adminSettings.security')}
             </span>
           }
           key="security"
         >
-          <Card title="Security Settings">
+          <Card title={t('adminSettings.securitySettings')}>
             <Form
               form={securityForm}
               layout="vertical"
@@ -419,31 +419,31 @@ const Settings: React.FC = () => {
                 lockout_duration: 15,
               }}
             >
-              <Title level={5}>Two-Factor Authentication</Title>
+              <Title level={5}>{t('adminSettings.twoFactorAuth')}</Title>
               <Form.Item
                 name="require_2fa"
-                label="Require 2FA for all users"
+                label={t('adminSettings.require2FA')}
                 valuePropName="checked"
               >
                 <Switch />
               </Form.Item>
 
               <Divider />
-              <Title level={5}>Session Settings</Title>
+              <Title level={5}>{t('adminSettings.sessionSettings')}</Title>
               <Form.Item
                 name="session_lifetime"
-                label="Session Lifetime (minutes)"
+                label={t('adminSettings.sessionTimeout')}
               >
                 <InputNumber min={5} max={1440} style={{ width: 200 }} />
               </Form.Item>
 
               <Divider />
-              <Title level={5}>Password Policy</Title>
+              <Title level={5}>{t('adminSettings.passwordPolicy')}</Title>
               <Row gutter={16}>
                 <Col span={8}>
                   <Form.Item
                     name="password_min_length"
-                    label="Minimum Length"
+                    label={t('adminSettings.minPasswordLength')}
                   >
                     <InputNumber min={6} max={32} style={{ width: '100%' }} />
                   </Form.Item>
@@ -451,7 +451,7 @@ const Settings: React.FC = () => {
                 <Col span={8}>
                   <Form.Item
                     name="password_require_uppercase"
-                    label="Require Uppercase"
+                    label={t('adminSettings.requireUppercase')}
                     valuePropName="checked"
                   >
                     <Switch />
@@ -460,7 +460,7 @@ const Settings: React.FC = () => {
                 <Col span={8}>
                   <Form.Item
                     name="password_require_numbers"
-                    label="Require Numbers"
+                    label={t('adminSettings.requireNumber')}
                     valuePropName="checked"
                   >
                     <Switch />
@@ -469,12 +469,12 @@ const Settings: React.FC = () => {
               </Row>
 
               <Divider />
-              <Title level={5}>Login Protection</Title>
+              <Title level={5}>{t('adminSettings.loginProtection')}</Title>
               <Row gutter={16}>
                 <Col span={12}>
                   <Form.Item
                     name="max_login_attempts"
-                    label="Max Login Attempts"
+                    label={t('adminSettings.maxLoginAttempts')}
                   >
                     <InputNumber min={3} max={10} style={{ width: '100%' }} />
                   </Form.Item>
@@ -482,7 +482,7 @@ const Settings: React.FC = () => {
                 <Col span={12}>
                   <Form.Item
                     name="lockout_duration"
-                    label="Lockout Duration (minutes)"
+                    label={t('adminSettings.lockoutDuration')}
                   >
                     <InputNumber min={5} max={60} style={{ width: '100%' }} />
                   </Form.Item>
@@ -491,7 +491,7 @@ const Settings: React.FC = () => {
 
               <Form.Item>
                 <Button type="primary" htmlType="submit" loading={loading}>
-                  Save Security Settings
+                  {t('adminSettings.saveSecuritySettings')}
                 </Button>
               </Form.Item>
             </Form>
@@ -503,12 +503,12 @@ const Settings: React.FC = () => {
           tab={
             <span>
               <ClockCircleOutlined />
-              SLA Defaults
+              {t('adminSettings.slaDefaults')}
             </span>
           }
           key="sla"
         >
-          <Card title="Default SLA Settings">
+          <Card title={t('adminSettings.defaultSlaSettings')}>
             <Form
               form={slaForm}
               layout="vertical"
@@ -538,7 +538,7 @@ const Settings: React.FC = () => {
               </Form.Item>
 
               <Divider />
-              <Title level={5}>Business Hours</Title>
+              <Title level={5}>{t('adminSettings.businessHours')}</Title>
               <Form.Item
                 name="business_hours_only"
                 label="Calculate SLA during business hours only"
@@ -551,7 +551,7 @@ const Settings: React.FC = () => {
                 <Col span={12}>
                   <Form.Item
                     name="business_hours_start"
-                    label="Business Hours Start"
+                    label={t('adminSettings.startTime')}
                   >
                     <Input type="time" style={{ width: '100%' }} />
                   </Form.Item>
@@ -559,7 +559,7 @@ const Settings: React.FC = () => {
                 <Col span={12}>
                   <Form.Item
                     name="business_hours_end"
-                    label="Business Hours End"
+                    label={t('adminSettings.endTime')}
                   >
                     <Input type="time" style={{ width: '100%' }} />
                   </Form.Item>
@@ -568,7 +568,7 @@ const Settings: React.FC = () => {
 
               <Form.Item>
                 <Button type="primary" htmlType="submit" loading={loading}>
-                  Save SLA Settings
+                  {t('adminSettings.saveSlaSettings')}
                 </Button>
               </Form.Item>
             </Form>

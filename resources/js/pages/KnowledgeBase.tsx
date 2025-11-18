@@ -31,98 +31,98 @@ const { Title, Text, Paragraph } = Typography;
 const { Search } = Input;
 const { Panel } = Collapse;
 
-// Sample data - this would come from API in production
-const categories = [
-  {
-    id: 1,
-    name: 'Getting Started',
-    icon: <BookOutlined />,
-    description: 'Learn the basics of using the support system',
-    articleCount: 5,
-  },
-  {
-    id: 2,
-    name: 'Account & Billing',
-    icon: <FolderOutlined />,
-    description: 'Manage your account settings and billing information',
-    articleCount: 8,
-  },
-  {
-    id: 3,
-    name: 'Troubleshooting',
-    icon: <QuestionCircleOutlined />,
-    description: 'Common issues and how to resolve them',
-    articleCount: 12,
-  },
-  {
-    id: 4,
-    name: 'Features & How-To',
-    icon: <FileTextOutlined />,
-    description: 'Detailed guides on using specific features',
-    articleCount: 15,
-  },
-];
-
-const popularArticles = [
-  {
-    id: 1,
-    title: 'How to create a new support ticket',
-    category: 'Getting Started',
-    views: 1234,
-  },
-  {
-    id: 2,
-    title: 'Understanding ticket priorities and SLAs',
-    category: 'Getting Started',
-    views: 987,
-  },
-  {
-    id: 3,
-    title: 'How to reset your password',
-    category: 'Account & Billing',
-    views: 856,
-  },
-  {
-    id: 4,
-    title: 'Troubleshooting login issues',
-    category: 'Troubleshooting',
-    views: 743,
-  },
-  {
-    id: 5,
-    title: 'Adding attachments to tickets',
-    category: 'Features & How-To',
-    views: 621,
-  },
-];
-
-const faqItems = [
-  {
-    question: 'How do I create a new support ticket?',
-    answer: 'To create a new ticket, click on the "New Ticket" button in the dashboard or navigate to Tickets > Create New. Fill in the required fields including title, description, category, and priority, then click Submit.',
-  },
-  {
-    question: 'What do the different ticket priorities mean?',
-    answer: 'Low: Non-urgent issues that can wait. Medium: Standard issues requiring attention within normal timeframes. High: Important issues that need prompt attention. Urgent: Critical issues requiring immediate response.',
-  },
-  {
-    question: 'How can I track my ticket status?',
-    answer: 'You can view all your tickets in the Tickets section. Each ticket displays its current status (New, Open, In Progress, On Hold, Resolved, Closed) along with the assigned agent and any updates.',
-  },
-  {
-    question: 'How do SLA timers work?',
-    answer: 'SLA (Service Level Agreement) timers track response and resolution times based on ticket priority. Response time measures how quickly an agent responds, while resolution time measures how long until the issue is fully resolved.',
-  },
-  {
-    question: 'Can I add attachments to my tickets?',
-    answer: 'Yes, you can attach files when creating a ticket or adding comments. Supported formats include images, PDFs, documents, and zip files up to 10MB each.',
-  },
-];
-
 const KnowledgeBase: React.FC = () => {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedArticle, setSelectedArticle] = useState<number | null>(null);
+
+  // Sample data - this would come from API in production
+  const categories = [
+    {
+      id: 1,
+      name: t('knowledgeBase.gettingStarted'),
+      icon: <BookOutlined />,
+      description: t('knowledgeBase.gettingStartedDesc'),
+      articleCount: 5,
+    },
+    {
+      id: 2,
+      name: t('knowledgeBase.accountBilling'),
+      icon: <FolderOutlined />,
+      description: t('knowledgeBase.accountBillingDesc'),
+      articleCount: 8,
+    },
+    {
+      id: 3,
+      name: t('knowledgeBase.troubleshooting'),
+      icon: <QuestionCircleOutlined />,
+      description: t('knowledgeBase.troubleshootingDesc'),
+      articleCount: 12,
+    },
+    {
+      id: 4,
+      name: t('knowledgeBase.featuresHowTo'),
+      icon: <FileTextOutlined />,
+      description: t('knowledgeBase.featuresHowToDesc'),
+      articleCount: 15,
+    },
+  ];
+
+  const popularArticles = [
+    {
+      id: 1,
+      title: t('knowledgeBase.articleCreateTicket'),
+      category: t('knowledgeBase.gettingStarted'),
+      views: 1234,
+    },
+    {
+      id: 2,
+      title: t('knowledgeBase.articlePrioritiesSla'),
+      category: t('knowledgeBase.gettingStarted'),
+      views: 987,
+    },
+    {
+      id: 3,
+      title: t('knowledgeBase.articleResetPassword'),
+      category: t('knowledgeBase.accountBilling'),
+      views: 856,
+    },
+    {
+      id: 4,
+      title: t('knowledgeBase.articleLoginIssues'),
+      category: t('knowledgeBase.troubleshooting'),
+      views: 743,
+    },
+    {
+      id: 5,
+      title: t('knowledgeBase.articleAttachments'),
+      category: t('knowledgeBase.featuresHowTo'),
+      views: 621,
+    },
+  ];
+
+  const faqItems = [
+    {
+      question: t('knowledgeBase.faqHowToSubmit'),
+      answer: t('knowledgeBase.faqHowToSubmitAnswer'),
+    },
+    {
+      question: t('knowledgeBase.faqResponseTime'),
+      answer: t('knowledgeBase.faqResponseTimeAnswer'),
+    },
+    {
+      question: t('knowledgeBase.faqTrackStatus'),
+      answer: t('knowledgeBase.faqTrackStatusAnswer'),
+    },
+    {
+      question: t('knowledgeBase.faqAddAttachment'),
+      answer: t('knowledgeBase.faqAddAttachmentAnswer'),
+    },
+    {
+      question: t('knowledgeBase.faqContactSupport'),
+      answer: t('knowledgeBase.faqContactSupportAnswer'),
+    },
+  ];
 
   const handleSearch = (value: string) => {
     setSearchQuery(value);
@@ -135,16 +135,16 @@ const KnowledgeBase: React.FC = () => {
     <div>
       <Breadcrumb style={{ marginBottom: 16 }}>
         <Breadcrumb.Item href="/knowledge-base">
-          <HomeOutlined /> Knowledge Base
+          <HomeOutlined /> {t('knowledgeBase.title')}
         </Breadcrumb.Item>
-        <Breadcrumb.Item>Getting Started</Breadcrumb.Item>
-        <Breadcrumb.Item>How to create a new support ticket</Breadcrumb.Item>
+        <Breadcrumb.Item>{t('knowledgeBase.gettingStarted')}</Breadcrumb.Item>
+        <Breadcrumb.Item>{t('knowledgeBase.articleCreateTicket')}</Breadcrumb.Item>
       </Breadcrumb>
 
-      <Title level={3}>How to create a new support ticket</Title>
+      <Title level={3}>{t('knowledgeBase.articleCreateTicket')}</Title>
       <Space style={{ marginBottom: 16 }}>
-        <Tag>Getting Started</Tag>
-        <Text type="secondary"><EyeOutlined /> 1,234 views</Text>
+        <Tag>{t('knowledgeBase.gettingStarted')}</Tag>
+        <Text type="secondary"><EyeOutlined /> 1,234 {t('knowledgeBase.views')}</Text>
       </Space>
 
       <Paragraph>
@@ -181,11 +181,11 @@ const KnowledgeBase: React.FC = () => {
       </Paragraph>
 
       <div style={{ marginTop: 24, padding: 16, background: '#f5f5f5', borderRadius: 8 }}>
-        <Text strong>Was this article helpful?</Text>
+        <Text strong>{t('knowledgeBase.wasHelpful')}</Text>
         <div style={{ marginTop: 8 }}>
           <Space>
-            <Button icon={<LikeOutlined />}>Yes</Button>
-            <Button icon={<DislikeOutlined />}>No</Button>
+            <Button icon={<LikeOutlined />}>{t('common.yes')}</Button>
+            <Button icon={<DislikeOutlined />}>{t('common.no')}</Button>
           </Space>
         </div>
       </div>
@@ -213,10 +213,10 @@ const KnowledgeBase: React.FC = () => {
       <div style={{ textAlign: 'center', marginBottom: 32 }}>
         <Title level={2}>
           <BookOutlined style={{ marginRight: 8 }} />
-          Knowledge Base
+          {t('knowledgeBase.title')}
         </Title>
         <Text type="secondary" style={{ fontSize: 16 }}>
-          Find answers to common questions and learn how to use the system
+          {t('knowledgeBase.subtitle')}
         </Text>
       </div>
 
@@ -224,7 +224,7 @@ const KnowledgeBase: React.FC = () => {
       <Row justify="center" style={{ marginBottom: 32 }}>
         <Col xs={24} sm={20} md={16} lg={12}>
           <Search
-            placeholder="Search articles..."
+            placeholder={t('knowledgeBase.searchPlaceholder')}
             allowClear
             enterButton={<SearchOutlined />}
             size="large"
@@ -234,7 +234,7 @@ const KnowledgeBase: React.FC = () => {
       </Row>
 
       {/* Categories */}
-      <Title level={4}>Browse by Category</Title>
+      <Title level={4}>{t('knowledgeBase.browseByCategory')}</Title>
       <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
         {categories.map(category => (
           <Col xs={24} sm={12} md={6} key={category.id}>
@@ -249,7 +249,7 @@ const KnowledgeBase: React.FC = () => {
               <Title level={5} style={{ marginBottom: 8 }}>{category.name}</Title>
               <Text type="secondary">{category.description}</Text>
               <div style={{ marginTop: 12 }}>
-                <Tag>{category.articleCount} articles</Tag>
+                <Tag>{category.articleCount} {t('knowledgeBase.articles')}</Tag>
               </div>
             </Card>
           </Col>
@@ -263,7 +263,7 @@ const KnowledgeBase: React.FC = () => {
             title={
               <span>
                 <FileTextOutlined style={{ marginRight: 8 }} />
-                Popular Articles
+                {t('knowledgeBase.popularArticles')}
               </span>
             }
           >
@@ -297,7 +297,7 @@ const KnowledgeBase: React.FC = () => {
             title={
               <span>
                 <QuestionCircleOutlined style={{ marginRight: 8 }} />
-                Frequently Asked Questions
+                {t('knowledgeBase.faq')}
               </span>
             }
           >
@@ -326,12 +326,12 @@ const KnowledgeBase: React.FC = () => {
           <Empty
             description={
               <span>
-                No articles found for "<strong>{searchQuery}</strong>"
+                {t('knowledgeBase.noArticlesFound')} "<strong>{searchQuery}</strong>"
               </span>
             }
           >
             <Button type="primary" onClick={() => setSearchQuery('')}>
-              Clear Search
+              {t('knowledgeBase.clearSearch')}
             </Button>
           </Empty>
         </Card>
@@ -339,12 +339,12 @@ const KnowledgeBase: React.FC = () => {
 
       {/* Contact Support */}
       <Card style={{ marginTop: 24, textAlign: 'center' }}>
-        <Title level={5}>Can't find what you're looking for?</Title>
+        <Title level={5}>{t('knowledgeBase.cantFindAnswer')}</Title>
         <Paragraph type="secondary">
-          If you couldn't find the answer to your question, our support team is here to help.
+          {t('knowledgeBase.cantFindAnswerDesc')}
         </Paragraph>
         <Button type="primary" href="/tickets/create">
-          Create a Support Ticket
+          {t('knowledgeBase.createSupportTicket')}
         </Button>
       </Card>
     </div>

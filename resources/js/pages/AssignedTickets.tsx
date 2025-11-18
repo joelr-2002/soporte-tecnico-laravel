@@ -132,9 +132,9 @@ const AssignedTickets: React.FC = () => {
     if (!ticket.sla_status) return null;
 
     const statusConfig = {
-      ok: { status: 'success' as const, text: 'On Track' },
-      at_risk: { status: 'warning' as const, text: 'At Risk' },
-      breached: { status: 'error' as const, text: 'Breached' },
+      ok: { status: 'success' as const, text: t('assignedTickets.onTrack') },
+      at_risk: { status: 'warning' as const, text: t('assignedTickets.atRisk') },
+      breached: { status: 'error' as const, text: t('assignedTickets.breached') },
     };
 
     const config = statusConfig[ticket.sla_status];
@@ -144,7 +144,7 @@ const AssignedTickets: React.FC = () => {
   // Table columns
   const columns: ColumnsType<Ticket> = [
     {
-      title: 'Ticket',
+      title: t('assignedTickets.ticket'),
       key: 'ticket',
       width: 280,
       render: (_, record) => (
@@ -156,7 +156,7 @@ const AssignedTickets: React.FC = () => {
       ),
     },
     {
-      title: 'Priority',
+      title: t('tickets.priority'),
       dataIndex: 'priority',
       key: 'priority',
       width: 100,
@@ -168,7 +168,7 @@ const AssignedTickets: React.FC = () => {
       ),
     },
     {
-      title: 'Status',
+      title: t('tickets.status'),
       dataIndex: 'status',
       key: 'status',
       width: 120,
@@ -179,13 +179,13 @@ const AssignedTickets: React.FC = () => {
       ),
     },
     {
-      title: 'SLA',
+      title: t('assignedTickets.slaStatus'),
       key: 'sla',
       width: 120,
       render: (_, record) => getSlaStatusBadge(record),
     },
     {
-      title: 'Client',
+      title: t('assignedTickets.client'),
       key: 'client',
       width: 150,
       render: (_, record) => (
@@ -193,7 +193,7 @@ const AssignedTickets: React.FC = () => {
       ),
     },
     {
-      title: 'Category',
+      title: t('assignedTickets.category'),
       key: 'category',
       width: 130,
       render: (_, record) => (
@@ -201,7 +201,7 @@ const AssignedTickets: React.FC = () => {
       ),
     },
     {
-      title: 'Created',
+      title: t('assignedTickets.created'),
       dataIndex: 'created_at',
       key: 'created_at',
       width: 120,
@@ -213,12 +213,12 @@ const AssignedTickets: React.FC = () => {
       ),
     },
     {
-      title: 'Actions',
+      title: t('common.actions'),
       key: 'actions',
       width: 80,
       align: 'center',
       render: (_, record) => (
-        <Tooltip title="View Ticket">
+        <Tooltip title={t('assignedTickets.viewTicket')}>
           <Button
             type="text"
             icon={<EyeOutlined />}
@@ -234,14 +234,14 @@ const AssignedTickets: React.FC = () => {
       <div style={{ marginBottom: 24 }}>
         <Row justify="space-between" align="middle">
           <Col>
-            <Title level={4} style={{ margin: 0 }}>My Assigned Tickets</Title>
+            <Title level={4} style={{ margin: 0 }}>{t('assignedTickets.title')}</Title>
           </Col>
           <Col>
             <Button
               icon={<ReloadOutlined />}
               onClick={fetchTickets}
             >
-              Refresh
+              {t('common.refresh')}
             </Button>
           </Col>
         </Row>
@@ -252,7 +252,7 @@ const AssignedTickets: React.FC = () => {
         <Col xs={12} sm={6}>
           <Card>
             <Statistic
-              title="Total Assigned"
+              title={t('assignedTickets.totalAssigned')}
               value={stats.total}
               prefix={<ClockCircleOutlined />}
             />
@@ -261,7 +261,7 @@ const AssignedTickets: React.FC = () => {
         <Col xs={12} sm={6}>
           <Card>
             <Statistic
-              title="New/Open"
+              title={t('assignedTickets.newOpen')}
               value={stats.new}
               prefix={<ExclamationCircleOutlined style={{ color: '#faad14' }} />}
               valueStyle={{ color: '#faad14' }}
@@ -271,7 +271,7 @@ const AssignedTickets: React.FC = () => {
         <Col xs={12} sm={6}>
           <Card>
             <Statistic
-              title="In Progress"
+              title={t('assignedTickets.inProgress')}
               value={stats.in_progress}
               prefix={<ClockCircleOutlined style={{ color: '#1890ff' }} />}
               valueStyle={{ color: '#1890ff' }}
@@ -281,7 +281,7 @@ const AssignedTickets: React.FC = () => {
         <Col xs={12} sm={6}>
           <Card>
             <Statistic
-              title="On Hold"
+              title={t('assignedTickets.onHold')}
               value={stats.on_hold}
               prefix={<CheckCircleOutlined style={{ color: '#8c8c8c' }} />}
               valueStyle={{ color: '#8c8c8c' }}
@@ -295,7 +295,7 @@ const AssignedTickets: React.FC = () => {
         <Row gutter={16}>
           <Col xs={24} sm={8}>
             <Input
-              placeholder="Search tickets..."
+              placeholder={t('assignedTickets.searchPlaceholder')}
               prefix={<SearchOutlined />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
@@ -308,7 +308,7 @@ const AssignedTickets: React.FC = () => {
           </Col>
           <Col xs={12} sm={8}>
             <Select
-              placeholder="Filter by status"
+              placeholder={t('assignedTickets.filterByStatus')}
               style={{ width: '100%' }}
               value={statusFilter}
               onChange={(value) => {
@@ -317,16 +317,16 @@ const AssignedTickets: React.FC = () => {
               }}
               allowClear
             >
-              <Select.Option value="new">New</Select.Option>
-              <Select.Option value="open">Open</Select.Option>
-              <Select.Option value="in_progress">In Progress</Select.Option>
-              <Select.Option value="on_hold">On Hold</Select.Option>
-              <Select.Option value="resolved">Resolved</Select.Option>
+              <Select.Option value="new">{t('status.new')}</Select.Option>
+              <Select.Option value="open">{t('status.open')}</Select.Option>
+              <Select.Option value="in_progress">{t('status.inProgress')}</Select.Option>
+              <Select.Option value="on_hold">{t('status.onHold')}</Select.Option>
+              <Select.Option value="resolved">{t('status.resolved')}</Select.Option>
             </Select>
           </Col>
           <Col xs={12} sm={8}>
             <Select
-              placeholder="Filter by priority"
+              placeholder={t('assignedTickets.filterByPriority')}
               style={{ width: '100%' }}
               value={priorityFilter}
               onChange={(value) => {
@@ -335,10 +335,10 @@ const AssignedTickets: React.FC = () => {
               }}
               allowClear
             >
-              <Select.Option value="low">Low</Select.Option>
-              <Select.Option value="medium">Medium</Select.Option>
-              <Select.Option value="high">High</Select.Option>
-              <Select.Option value="urgent">Urgent</Select.Option>
+              <Select.Option value="low">{t('priority.low')}</Select.Option>
+              <Select.Option value="medium">{t('priority.medium')}</Select.Option>
+              <Select.Option value="high">{t('priority.high')}</Select.Option>
+              <Select.Option value="urgent">{t('priority.urgent')}</Select.Option>
             </Select>
           </Col>
         </Row>
