@@ -38,6 +38,12 @@ import TicketEdit from './pages/tickets/TicketEdit';
 import Users from './pages/admin/Users';
 import Categories from './pages/admin/Categories';
 import ResponseTemplates from './pages/admin/ResponseTemplates';
+import Slas from './pages/admin/Slas';
+import AdminSettings from './pages/admin/Settings';
+
+// Additional Pages
+import AssignedTickets from './pages/AssignedTickets';
+import KnowledgeBase from './pages/KnowledgeBase';
 
 // Components
 import ProtectedRoute from './components/common/ProtectedRoute';
@@ -107,6 +113,8 @@ const MainApp: React.FC = () => {
         <Route path="reports" element={<Reports />} />
         <Route path="notifications" element={<Notifications />} />
         <Route path="settings" element={<Settings />} />
+        <Route path="assigned" element={<AssignedTickets />} />
+        <Route path="knowledge-base" element={<KnowledgeBase />} />
 
         {/* Ticket Routes */}
         <Route path="tickets">
@@ -140,6 +148,22 @@ const MainApp: React.FC = () => {
             element={
               <ProtectedRoute roles={['admin', 'agent']}>
                 <ResponseTemplates />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="slas"
+            element={
+              <ProtectedRoute roles={['admin']}>
+                <Slas />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="settings"
+            element={
+              <ProtectedRoute roles={['admin']}>
+                <AdminSettings />
               </ProtectedRoute>
             }
           />

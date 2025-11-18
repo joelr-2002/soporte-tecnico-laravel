@@ -55,13 +55,65 @@ export interface AuthState {
   token: string | null;
 }
 
+// SLA types
+export interface Sla {
+  id: number;
+  name: string;
+  description: string | null;
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  response_time: number;
+  resolution_time: number;
+  response_time_hours: number;
+  resolution_time_hours: number;
+  formatted_response_time: string;
+  formatted_resolution_time: string;
+  is_active: boolean;
+  tickets_count?: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SlaFormData {
+  name: string;
+  description?: string;
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  response_time: number;
+  resolution_time: number;
+  is_active?: boolean;
+}
+
+export interface SlaComplianceStats {
+  total_tickets_with_sla: number;
+  response: {
+    compliant: number;
+    breached: number;
+    at_risk: number;
+    compliance_rate: number;
+  };
+  resolution: {
+    compliant: number;
+    breached: number;
+    at_risk: number;
+    compliance_rate: number;
+  };
+  by_priority: {
+    [key: string]: {
+      total: number;
+      response_breached: number;
+      resolution_breached: number;
+      response_compliance_rate: number;
+      resolution_compliance_rate: number;
+    };
+  };
+}
+
 // Ticket types
 export interface Ticket {
   id: number;
   ticket_number: string;
   title: string;
   description: string;
-  status: 'open' | 'in_progress' | 'pending' | 'resolved' | 'closed';
+  status: 'open' | 'in_progress' | 'pending' | 'resolved' | 'closed' | 'new' | 'on_hold';
   priority: 'low' | 'medium' | 'high' | 'urgent';
   category_id: number;
   user_id: number;
@@ -74,9 +126,20 @@ export interface Ticket {
   updated_at: string;
   user?: User;
   assignee?: User;
+  assigned_agent?: User;
   category?: Category;
+  sla?: Sla;
   comments?: Comment[];
   attachments?: Attachment[];
+  // SLA fields
+  first_response_at?: string | null;
+  sla_response_due_at?: string | null;
+  sla_resolution_due_at?: string | null;
+  sla_response_breached?: boolean;
+  sla_resolution_breached?: boolean;
+  response_time_remaining?: number | null;
+  resolution_time_remaining?: number | null;
+  sla_status?: 'ok' | 'at_risk' | 'breached';
 }
 
 export interface TicketFormData {

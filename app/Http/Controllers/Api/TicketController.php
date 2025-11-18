@@ -24,7 +24,7 @@ class TicketController extends Controller
     {
         $user = $request->user();
 
-        $query = Ticket::with(['user', 'assignedAgent', 'category'])
+        $query = Ticket::with(['user', 'assignedAgent', 'category', 'sla'])
             ->withCount(['comments', 'attachments']);
 
         // Apply role-based filtering
@@ -68,7 +68,11 @@ class TicketController extends Controller
         }
 
         if ($request->filled('assigned_to')) {
-            $query->where('assigned_to', $request->assigned_to);
+            if ($request->assigned_to === 'me') {
+                $query->where('assigned_to', $user->id);
+            } else {
+                $query->where('assigned_to', $request->assigned_to);
+            }
         }
 
         // Sorting
@@ -92,6 +96,7 @@ class TicketController extends Controller
             'user',
             'assignedAgent',
             'category',
+            'sla',
             'comments' => function ($query) use ($request) {
                 // Clients should not see internal comments
                 if ($request->user()->isClient()) {

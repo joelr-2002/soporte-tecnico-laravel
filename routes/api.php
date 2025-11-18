@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\ResponseTemplateController;
 use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\SlaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -100,5 +101,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/agent-performance', [ReportController::class, 'agentPerformance']);
         Route::get('/resolution-time', [ReportController::class, 'resolutionTime']);
         Route::get('/export-csv', [ReportController::class, 'exportCsv']);
+    });
+
+    // SLAs
+    Route::prefix('slas')->group(function () {
+        Route::get('/', [SlaController::class, 'index']);
+        Route::post('/', [SlaController::class, 'store']);
+        Route::get('/compliance', [SlaController::class, 'compliance']);
+        Route::get('/at-risk', [SlaController::class, 'atRisk']);
+        Route::get('/breached', [SlaController::class, 'breached']);
+        Route::get('/{sla}', [SlaController::class, 'show']);
+        Route::put('/{sla}', [SlaController::class, 'update']);
+        Route::delete('/{sla}', [SlaController::class, 'destroy']);
     });
 });

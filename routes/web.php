@@ -84,6 +84,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         })->name('edit');
     });
 
+    // Assigned tickets (for agents)
+    Route::get('assigned', function () {
+        return Inertia::render('AssignedTickets');
+    })->name('assigned');
+
+    // Knowledge Base
+    Route::get('knowledge-base', function () {
+        return Inertia::render('KnowledgeBase');
+    })->name('knowledge-base');
+
     // Reports
     Route::get('reports', function () {
         return Inertia::render('Reports');
@@ -112,6 +122,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/response-templates', function () {
             return Inertia::render('admin/ResponseTemplates');
         })->name('response-templates');
+
+        Route::get('/slas', function () {
+            return Inertia::render('admin/Slas');
+        })->name('slas');
+
+        Route::get('/settings', function () {
+            return Inertia::render('admin/Settings');
+        })->name('settings');
     });
 });
 

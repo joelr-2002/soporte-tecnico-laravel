@@ -64,35 +64,38 @@ const Users: React.FC = () => {
   const [createForm] = Form.useForm();
   const [editForm] = Form.useForm();
 
-  // Pagination
-  const [pagination, setPagination] = useState<TablePaginationConfig>({
-    current: 1,
-    pageSize: 10,
+  // Pagination - separate state for trigger values
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [total, setTotal] = useState(0);
+
+  // Pagination config for table
+  const pagination: TablePaginationConfig = {
+    current: currentPage,
+    pageSize: pageSize,
+    total: total,
     showSizeChanger: true,
     showTotal: (total, range) => `${range[0]}-${range[1]} ${t('common.of')} ${total} ${t('users.title')}`,
-  });
+  };
 
   // Fetch users
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
       const response = await userService.getUsers({
-        page: pagination.current,
-        per_page: pagination.pageSize,
+        page: currentPage,
+        per_page: pageSize,
         search: searchText || undefined,
         role: roleFilter,
       });
       setUsers(response.data);
-      setPagination({
-        ...pagination,
-        total: response.total,
-      });
+      setTotal(response.total);
     } catch (error) {
       message.error(error instanceof Error ? error.message : t('users.failedToFetch'));
     } finally {
       setLoading(false);
     }
-  }, [pagination.current, pagination.pageSize, searchText, roleFilter, t]);
+  }, [currentPage, pageSize, searchText, roleFilter, t]);
 
   useEffect(() => {
     fetchUsers();
@@ -100,11 +103,8 @@ const Users: React.FC = () => {
 
   // Handle table change
   const handleTableChange = (newPagination: TablePaginationConfig) => {
-    setPagination({
-      ...pagination,
-      current: newPagination.current,
-      pageSize: newPagination.pageSize,
-    });
+    if (newPagination.current) setCurrentPage(newPagination.current);
+    if (newPagination.pageSize) setPageSize(newPagination.pageSize);
   };
 
   // Create user
@@ -341,7 +341,7 @@ const Users: React.FC = () => {
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               onPressEnter={() => {
-                setPagination({ ...pagination, current: 1 });
+                setCurrentPage(1);
                 fetchUsers();
               }}
               allowClear
@@ -354,7 +354,7 @@ const Users: React.FC = () => {
               value={roleFilter}
               onChange={(value) => {
                 setRoleFilter(value);
-                setPagination({ ...pagination, current: 1 });
+                setCurrentPage(1);
               }}
               allowClear
             >
